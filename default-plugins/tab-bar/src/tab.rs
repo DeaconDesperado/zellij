@@ -4,7 +4,7 @@ use unicode_width::UnicodeWidthStr;
 use zellij_tile::prelude::*;
 use zellij_tile_utils::style;
 
-fn cursors(focused_clients: &[ClientId], palette: Palette) -> (Vec<ANSIString>, usize) {
+fn cursors(focused_clients: &[ClientId], palette: TermPalette) -> (Vec<ANSIString>, usize) {
     // cursor section, text length
     let mut len = 0;
     let mut cursors = vec![];
@@ -21,7 +21,7 @@ pub fn render_tab(
     text: String,
     tab: &TabInfo,
     is_alternate_tab: bool,
-    palette: Palette,
+    palette: TermPalette,
     separator: &str,
 ) -> LinePart {
     let focused_clients = tab.other_focused_clients.as_slice();
@@ -84,7 +84,7 @@ pub fn tab_style(
     mut tabname: String,
     tab: &TabInfo,
     mut is_alternate_tab: bool,
-    palette: Palette,
+    palette: TermPalette,
     capabilities: PluginCapabilities,
 ) -> LinePart {
     let separator = tab_separator(capabilities);

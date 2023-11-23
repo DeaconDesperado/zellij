@@ -6,7 +6,7 @@ use insta::assert_snapshot;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use zellij_utils::data::{Palette, Style};
+use zellij_utils::data::{Style, TermPalette};
 use zellij_utils::pane_size::PaneGeom;
 
 fn read_fixture() -> Vec<u8> {
@@ -40,7 +40,7 @@ fn create_pane() -> TerminalPane {
         Rc::new(RefCell::new(LinkHandler::new())),
         Rc::new(RefCell::new(None)),
         sixel_image_store,
-        Rc::new(RefCell::new(Palette::default())),
+        Rc::new(RefCell::new(TermPalette::default())),
         terminal_emulator_color_codes,
         None,
         None,

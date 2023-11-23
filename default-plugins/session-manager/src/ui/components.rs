@@ -625,10 +625,10 @@ pub fn render_controls_line(is_searching: bool, row: usize, max_cols: usize, col
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Colors {
-    pub palette: Palette,
+    pub palette: TermPalette,
 }
 impl Colors {
-    pub fn new(palette: Palette) -> Self {
+    pub fn new(palette: TermPalette) -> Self {
         Colors { palette }
     }
     pub fn bold(&self, text: &str) -> String {

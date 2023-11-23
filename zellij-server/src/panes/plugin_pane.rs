@@ -18,7 +18,7 @@ use zellij_utils::pane_size::{Offset, SizeInPixels};
 use zellij_utils::position::Position;
 use zellij_utils::{
     channels::SenderWithContext,
-    data::{Event, InputMode, Mouse, Palette, PaletteColor, Style},
+    data::{Event, InputMode, Mouse, PaletteColor, Style, TermPalette},
     errors::prelude::*,
     input::layout::Run,
     pane_size::PaneGeom,
@@ -73,7 +73,7 @@ pub(crate) struct PluginPane {
     pub pane_name: String,
     pub style: Style,
     sixel_image_store: Rc<RefCell<SixelImageStore>>,
-    terminal_emulator_colors: Rc<RefCell<Palette>>,
+    terminal_emulator_colors: Rc<RefCell<TermPalette>>,
     terminal_emulator_color_codes: Rc<RefCell<HashMap<usize, String>>>,
     link_handler: Rc<RefCell<LinkHandler>>,
     character_cell_size: Rc<RefCell<Option<SizeInPixels>>>,
@@ -100,7 +100,7 @@ impl PluginPane {
         title: String,
         pane_name: String,
         sixel_image_store: Rc<RefCell<SixelImageStore>>,
-        terminal_emulator_colors: Rc<RefCell<Palette>>,
+        terminal_emulator_colors: Rc<RefCell<TermPalette>>,
         terminal_emulator_color_codes: Rc<RefCell<HashMap<usize, String>>>,
         link_handler: Rc<RefCell<LinkHandler>>,
         character_cell_size: Rc<RefCell<Option<SizeInPixels>>>,

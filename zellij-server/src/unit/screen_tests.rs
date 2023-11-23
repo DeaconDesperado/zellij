@@ -32,7 +32,7 @@ use zellij_utils::ipc::PixelDimensions;
 
 use zellij_utils::{
     channels::{self, ChannelWithContext, Receiver},
-    data::{Direction, InputMode, ModeInfo, Palette, PluginCapabilities},
+    data::{Direction, InputMode, ModeInfo, PluginCapabilities, TermPalette},
     interprocess::local_socket::LocalSocketStream,
     ipc::{ClientAttributes, ClientToServerMsg, ServerToClientMsg},
 };
@@ -72,7 +72,7 @@ fn take_snapshots_and_cursor_coordinates_from_render_events<'a>(
     let mut grid = Grid::new(
         screen_size.rows,
         screen_size.cols,
-        Rc::new(RefCell::new(Palette::default())),
+        Rc::new(RefCell::new(TermPalette::default())),
         terminal_emulator_color_codes,
         Rc::new(RefCell::new(LinkHandler::new())),
         character_cell_size,
@@ -196,7 +196,7 @@ impl ServerOsApi for FakeInputOutput {
     fn remove_client(&mut self, _client_id: ClientId) -> Result<()> {
         unimplemented!()
     }
-    fn load_palette(&self) -> Palette {
+    fn load_palette(&self) -> TermPalette {
         unimplemented!()
     }
     fn get_cwd(&self, _pid: Pid) -> Option<PathBuf> {

@@ -17,7 +17,7 @@ use std::{
 
 use zellij_utils::{
     consts::{DEFAULT_SCROLL_BUFFER_SIZE, SCROLL_BUFFER_SIZE},
-    data::{Palette, PaletteColor},
+    data::{PaletteColor, TermPalette},
     pane_size::SizeInPixels,
     position::Position,
     vte,
@@ -340,7 +340,7 @@ pub struct Grid {
     scroll_region: Option<(usize, usize)>,
     active_charset: CharsetIndex,
     preceding_char: Option<TerminalCharacter>,
-    terminal_emulator_colors: Rc<RefCell<Palette>>,
+    terminal_emulator_colors: Rc<RefCell<TermPalette>>,
     terminal_emulator_color_codes: Rc<RefCell<HashMap<usize, String>>>,
     pub(crate) output_buffer: OutputBuffer,
     title_stack: Vec<String>,
@@ -457,7 +457,7 @@ impl Grid {
     pub fn new(
         rows: usize,
         columns: usize,
-        terminal_emulator_colors: Rc<RefCell<Palette>>,
+        terminal_emulator_colors: Rc<RefCell<TermPalette>>,
         terminal_emulator_color_codes: Rc<RefCell<HashMap<usize, String>>>,
         link_handler: Rc<RefCell<LinkHandler>>,
         character_cell_size: Rc<RefCell<Option<SizeInPixels>>>,

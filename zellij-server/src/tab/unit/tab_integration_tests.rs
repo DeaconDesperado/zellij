@@ -37,7 +37,7 @@ use std::os::unix::io::RawFd;
 use std::rc::Rc;
 
 use zellij_utils::{
-    data::{InputMode, ModeInfo, Palette, Style},
+    data::{InputMode, ModeInfo, Style, TermPalette},
     input::command::{RunCommand, TerminalAction},
     interprocess::local_socket::LocalSocketStream,
     ipc::{ClientToServerMsg, ServerToClientMsg},
@@ -109,7 +109,7 @@ impl ServerOsApi for FakeInputOutput {
     fn remove_client(&mut self, _client_id: ClientId) -> Result<()> {
         unimplemented!()
     }
-    fn load_palette(&self) -> Palette {
+    fn load_palette(&self) -> TermPalette {
         unimplemented!()
     }
     fn get_cwd(&self, _pid: Pid) -> Option<PathBuf> {
@@ -219,7 +219,7 @@ fn create_new_tab(size: Size, default_mode: ModeInfo) -> Tab {
     connected_clients.insert(client_id);
     let connected_clients = Rc::new(RefCell::new(connected_clients));
     let character_cell_info = Rc::new(RefCell::new(None));
-    let terminal_emulator_colors = Rc::new(RefCell::new(Palette::default()));
+    let terminal_emulator_colors = Rc::new(RefCell::new(TermPalette::default()));
     let copy_options = CopyOptions::default();
     let terminal_emulator_color_codes = Rc::new(RefCell::new(HashMap::new()));
     let sixel_image_store = Rc::new(RefCell::new(SixelImageStore::default()));
@@ -296,7 +296,7 @@ fn create_new_tab_with_swap_layouts(
     connected_clients.insert(client_id);
     let connected_clients = Rc::new(RefCell::new(connected_clients));
     let character_cell_info = Rc::new(RefCell::new(None));
-    let terminal_emulator_colors = Rc::new(RefCell::new(Palette::default()));
+    let terminal_emulator_colors = Rc::new(RefCell::new(TermPalette::default()));
     let copy_options = CopyOptions::default();
     let terminal_emulator_color_codes = Rc::new(RefCell::new(HashMap::new()));
     let sixel_image_store = Rc::new(RefCell::new(SixelImageStore::default()));
@@ -375,7 +375,7 @@ fn create_new_tab_with_os_api(
     connected_clients.insert(client_id);
     let connected_clients = Rc::new(RefCell::new(connected_clients));
     let character_cell_info = Rc::new(RefCell::new(None));
-    let terminal_emulator_colors = Rc::new(RefCell::new(Palette::default()));
+    let terminal_emulator_colors = Rc::new(RefCell::new(TermPalette::default()));
     let copy_options = CopyOptions::default();
     let terminal_emulator_color_codes = Rc::new(RefCell::new(HashMap::new()));
     let sixel_image_store = Rc::new(RefCell::new(SixelImageStore::default()));
@@ -438,7 +438,7 @@ fn create_new_tab_with_layout(size: Size, default_mode: ModeInfo, layout: &str) 
     connected_clients.insert(client_id);
     let connected_clients = Rc::new(RefCell::new(connected_clients));
     let character_cell_info = Rc::new(RefCell::new(None));
-    let terminal_emulator_colors = Rc::new(RefCell::new(Palette::default()));
+    let terminal_emulator_colors = Rc::new(RefCell::new(TermPalette::default()));
     let copy_options = CopyOptions::default();
     let terminal_emulator_color_codes = Rc::new(RefCell::new(HashMap::new()));
     let sixel_image_store = Rc::new(RefCell::new(SixelImageStore::default()));
@@ -519,7 +519,7 @@ fn create_new_tab_with_mock_pty_writer(
     connected_clients.insert(client_id);
     let connected_clients = Rc::new(RefCell::new(connected_clients));
     let character_cell_info = Rc::new(RefCell::new(None));
-    let terminal_emulator_colors = Rc::new(RefCell::new(Palette::default()));
+    let terminal_emulator_colors = Rc::new(RefCell::new(TermPalette::default()));
     let copy_options = CopyOptions::default();
     let terminal_emulator_color_codes = Rc::new(RefCell::new(HashMap::new()));
     let sixel_image_store = Rc::new(RefCell::new(SixelImageStore::default()));
@@ -590,7 +590,7 @@ fn create_new_tab_with_sixel_support(
         width: 8,
         height: 21,
     })));
-    let terminal_emulator_colors = Rc::new(RefCell::new(Palette::default()));
+    let terminal_emulator_colors = Rc::new(RefCell::new(TermPalette::default()));
     let copy_options = CopyOptions::default();
     let terminal_emulator_color_codes = Rc::new(RefCell::new(HashMap::new()));
     let debug = false;
@@ -649,7 +649,12 @@ use crate::panes::link_handler::LinkHandler;
 use insta::assert_snapshot;
 use zellij_utils::vte;
 
-fn take_snapshot(ansi_instructions: &str, rows: usize, columns: usize, palette: Palette) -> String {
+fn take_snapshot(
+    ansi_instructions: &str,
+    rows: usize,
+    columns: usize,
+    palette: TermPalette,
+) -> String {
     let sixel_image_store = Rc::new(RefCell::new(SixelImageStore::default()));
     let terminal_emulator_color_codes = Rc::new(RefCell::new(HashMap::new()));
     let character_cell_size = Rc::new(RefCell::new(Some(SizeInPixels {
@@ -683,7 +688,7 @@ fn take_snapshot_with_sixel(
     ansi_instructions: &str,
     rows: usize,
     columns: usize,
-    palette: Palette,
+    palette: TermPalette,
     sixel_image_store: Rc<RefCell<SixelImageStore>>,
 ) -> String {
     let terminal_emulator_color_codes = Rc::new(RefCell::new(HashMap::new()));
@@ -718,7 +723,7 @@ fn take_snapshot_and_cursor_position(
     ansi_instructions: &str,
     rows: usize,
     columns: usize,
-    palette: Palette,
+    palette: TermPalette,
 ) -> (String, Option<(usize, usize)>) {
     // snapshot, x_coordinates, y_coordinates
     let sixel_image_store = Rc::new(RefCell::new(SixelImageStore::default()));
@@ -826,7 +831,7 @@ fn new_floating_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -858,7 +863,7 @@ fn floating_panes_persist_across_toggles() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -887,7 +892,7 @@ fn toggle_floating_panes_off() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -917,7 +922,7 @@ fn toggle_floating_panes_on() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -965,7 +970,7 @@ fn five_new_floating_panes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -995,7 +1000,7 @@ fn increase_floating_pane_size() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1025,7 +1030,7 @@ fn decrease_floating_pane_size() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1058,7 +1063,7 @@ fn resize_floating_pane_left() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1091,7 +1096,7 @@ fn resize_floating_pane_right() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1124,7 +1129,7 @@ fn resize_floating_pane_up() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1157,7 +1162,7 @@ fn resize_floating_pane_down() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1206,7 +1211,7 @@ fn move_floating_pane_focus_left() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -1262,7 +1267,7 @@ fn move_floating_pane_focus_right() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -1317,7 +1322,7 @@ fn move_floating_pane_focus_up() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -1373,7 +1378,7 @@ fn move_floating_pane_focus_down() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -1431,7 +1436,7 @@ fn move_floating_pane_focus_with_mouse() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -1489,7 +1494,7 @@ fn move_pane_focus_with_mouse_to_non_floating_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -1547,7 +1552,7 @@ fn drag_pane_with_mouse() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -1613,7 +1618,7 @@ fn mark_text_inside_floating_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -1672,7 +1677,7 @@ fn resize_tab_with_floating_panes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -1722,7 +1727,7 @@ fn shrink_whole_tab_with_floating_panes_horizontally_and_vertically() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -1777,7 +1782,7 @@ fn shrink_whole_tab_with_floating_panes_horizontally_and_vertically_and_expand_b
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -1807,7 +1812,7 @@ fn embed_floating_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1835,7 +1840,7 @@ fn float_embedded_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1865,7 +1870,7 @@ fn embed_floating_pane_without_pane_frames() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1894,7 +1899,7 @@ fn float_embedded_pane_without_pane_frames() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1919,7 +1924,7 @@ fn cannot_float_only_embedded_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1943,7 +1948,7 @@ fn replacing_existing_wide_characters() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1969,7 +1974,7 @@ fn rename_embedded_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -1999,7 +2004,7 @@ fn rename_floating_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2021,7 +2026,7 @@ fn wide_characters_in_left_title_side() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2048,7 +2053,7 @@ fn save_cursor_position_across_resizes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2084,7 +2089,7 @@ fn move_floating_pane_with_sixel_image() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
         sixel_image_store,
     );
 
@@ -2122,7 +2127,7 @@ fn floating_pane_above_sixel_image() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
         sixel_image_store,
     );
 
@@ -2148,7 +2153,7 @@ fn suppress_tiled_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2177,7 +2182,7 @@ fn suppress_floating_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2204,7 +2209,7 @@ fn close_suppressing_tiled_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2236,7 +2241,7 @@ fn close_suppressing_floating_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2264,7 +2269,7 @@ fn suppress_tiled_pane_float_it_and_close() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2297,7 +2302,7 @@ fn suppress_floating_pane_embed_it_and_close_it() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2326,7 +2331,7 @@ fn resize_whole_tab_while_tiled_pane_is_suppressed() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2360,7 +2365,7 @@ fn resize_whole_tab_while_floting_pane_is_suppressed() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2385,7 +2390,7 @@ fn enter_search_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!("search_tab_nothing_highlighted", snapshot);
 
@@ -2399,7 +2404,7 @@ fn enter_search_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!("search_tab_highlight_tortor", snapshot);
 
@@ -2412,7 +2417,7 @@ fn enter_search_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!("search_tab_highlight_tortor_modified", snapshot);
 
@@ -2426,7 +2431,7 @@ fn enter_search_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!("search_tab_highlight_tortor", snapshot);
 }
@@ -2456,7 +2461,7 @@ fn enter_search_floating_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!("search_floating_tab_nothing_highlighted", snapshot);
 
@@ -2468,7 +2473,7 @@ fn enter_search_floating_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!("search_floating_tab_highlight_fring", snapshot);
 }
@@ -2746,7 +2751,7 @@ fn tab_with_basic_layout() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2774,7 +2779,7 @@ fn tab_with_layout_that_has_floating_panes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2814,7 +2819,7 @@ fn tab_with_nested_layout() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -2848,7 +2853,7 @@ fn tab_with_nested_uneven_layout() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -3143,7 +3148,7 @@ fn can_swap_tiled_layout_at_runtime() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -3200,7 +3205,7 @@ fn can_swap_floating_layout_at_runtime() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -3254,7 +3259,7 @@ fn swapping_layouts_after_resize_snaps_to_current_layout() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -3304,7 +3309,7 @@ fn swap_tiled_layout_with_stacked_children() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -3351,7 +3356,7 @@ fn swap_tiled_layout_with_only_stacked_children() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -3401,7 +3406,7 @@ fn swap_tiled_layout_with_stacked_children_and_no_pane_frames() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -3453,7 +3458,7 @@ fn move_focus_up_with_stacked_panes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -3506,7 +3511,7 @@ fn move_focus_down_with_stacked_panes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -3567,7 +3572,7 @@ fn move_focus_right_into_stacked_panes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -3634,7 +3639,7 @@ fn move_focus_left_into_stacked_panes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -3705,7 +3710,7 @@ fn move_focus_up_into_stacked_panes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -3773,7 +3778,7 @@ fn move_focus_down_into_stacked_panes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -3830,7 +3835,7 @@ fn close_main_stacked_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -3890,7 +3895,7 @@ fn close_main_stacked_pane_in_mid_stack() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -3951,7 +3956,7 @@ fn close_one_liner_stacked_pane_below_main_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4011,7 +4016,7 @@ fn close_one_liner_stacked_pane_above_main_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4073,7 +4078,7 @@ fn can_increase_size_of_main_pane_in_stack_horizontally() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4137,7 +4142,7 @@ fn can_increase_size_of_main_pane_in_stack_vertically() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4199,7 +4204,7 @@ fn can_increase_size_of_main_pane_in_stack_non_directionally() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4260,7 +4265,7 @@ fn can_increase_size_into_pane_stack_horizontally() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4325,7 +4330,7 @@ fn can_increase_size_into_pane_stack_vertically() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4386,7 +4391,7 @@ fn can_increase_size_into_pane_stack_non_directionally() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4446,7 +4451,7 @@ fn decreasing_size_of_whole_tab_treats_stacked_panes_properly() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4510,7 +4515,7 @@ fn increasing_size_of_whole_tab_treats_stacked_panes_properly() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4575,7 +4580,7 @@ fn cannot_decrease_stack_size_beyond_minimum_height() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4634,7 +4639,7 @@ fn focus_stacked_pane_over_flexible_pane_with_the_mouse() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4695,7 +4700,7 @@ fn focus_stacked_pane_under_flexible_pane_with_the_mouse() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -4757,7 +4762,7 @@ fn close_stacked_pane_with_previously_focused_other_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -4820,7 +4825,7 @@ fn close_pane_near_stacked_panes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -4885,7 +4890,7 @@ fn focus_next_pane_expands_stacked_panes() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -4945,7 +4950,7 @@ fn stacked_panes_can_become_fullscreen() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -5046,7 +5051,7 @@ fn layout_with_plugins_and_commands_swaped_properly() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -5148,7 +5153,7 @@ fn base_layout_is_included_in_swap_layouts() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -5245,7 +5250,7 @@ fn swap_layouts_including_command_panes_absent_from_existing_layout() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -5346,7 +5351,7 @@ fn swap_layouts_not_including_command_panes_present_in_existing_layout() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -5423,7 +5428,7 @@ fn swap_layouts_including_plugin_panes_absent_from_existing_layout() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -5520,7 +5525,7 @@ fn swap_layouts_not_including_plugin_panes_present_in_existing_layout() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -5607,7 +5612,7 @@ fn new_pane_in_auto_layout() {
             output.serialize().unwrap().get(&client_id).unwrap(),
             size.rows,
             size.cols,
-            Palette::default(),
+            TermPalette::default(),
         );
         let (expected_x, expected_y) = expected_cursor_coordinates.remove(0);
         assert_eq!(
@@ -5686,7 +5691,7 @@ fn when_swapping_tiled_layouts_in_a_damaged_state_layout_and_pane_focus_are_unch
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -5759,7 +5764,7 @@ fn when_swapping_tiled_layouts_in_an_undamaged_state_pane_focuses_on_focused_nod
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -5833,7 +5838,7 @@ fn when_swapping_tiled_layouts_in_an_undamaged_state_with_no_focus_node_pane_foc
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -5907,7 +5912,7 @@ fn when_closing_a_pane_in_auto_layout_the_focus_goes_to_last_focused_pane() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -6010,7 +6015,7 @@ fn floating_layout_with_plugins_and_commands_swaped_properly() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -6110,7 +6115,7 @@ fn base_floating_layout_is_included_in_swap_layouts() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -6207,7 +6212,7 @@ fn swap_floating_layouts_including_command_panes_absent_from_existing_layout() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -6308,7 +6313,7 @@ fn swap_floating_layouts_not_including_command_panes_present_in_existing_layout(
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -6378,7 +6383,7 @@ fn swap_floating_layouts_including_plugin_panes_absent_from_existing_layout() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -6471,7 +6476,7 @@ fn swap_floating_layouts_not_including_plugin_panes_present_in_existing_layout()
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
 
     assert_snapshot!(snapshot);
@@ -6551,7 +6556,7 @@ fn new_floating_pane_in_auto_layout() {
             output.serialize().unwrap().get(&client_id).unwrap(),
             size.rows,
             size.cols,
-            Palette::default(),
+            TermPalette::default(),
         );
         let (expected_x, expected_y) = expected_cursor_coordinates.remove(0);
         assert_eq!(
@@ -6629,7 +6634,7 @@ fn when_swapping_floating_layouts_in_a_damaged_state_layout_and_pane_focus_are_u
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -6701,7 +6706,7 @@ fn when_swapping_floating_layouts_in_an_undamaged_state_pane_focuses_on_focused_
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -6774,7 +6779,7 @@ fn when_swapping_floating_layouts_in_an_undamaged_state_with_no_focus_node_pane_
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -6848,7 +6853,7 @@ fn when_closing_a_floating_pane_in_auto_layout_the_focus_goes_to_last_focused_pa
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -6915,7 +6920,7 @@ fn when_resizing_whole_tab_with_auto_layout_and_floating_panes_the_layout_is_mai
         output.serialize().unwrap().get(&client_id).unwrap(),
         new_size.rows,
         new_size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_eq!(
         cursor_coordinates,
@@ -6954,7 +6959,7 @@ fn when_applying_a_truncated_swap_layout_child_attributes_are_not_ignored() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         new_size.rows,
         new_size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }
@@ -6986,7 +6991,7 @@ fn can_define_expanded_pane_in_stack() {
         output.serialize().unwrap().get(&client_id).unwrap(),
         size.rows,
         size.cols,
-        Palette::default(),
+        TermPalette::default(),
     );
     assert_snapshot!(snapshot);
 }

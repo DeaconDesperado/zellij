@@ -17,7 +17,7 @@ use std::cell::RefCell;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use std::rc::Rc;
 use zellij_utils::{
-    data::{Palette, Style},
+    data::{Style, TermPalette},
     input::layout::{
         FloatingPaneLayout, PluginUserConfiguration, Run, RunPluginLocation, TiledPaneLayout,
     },
@@ -29,7 +29,7 @@ pub struct LayoutApplier<'a> {
     senders: ThreadSenders,
     sixel_image_store: Rc<RefCell<SixelImageStore>>,
     link_handler: Rc<RefCell<LinkHandler>>,
-    terminal_emulator_colors: Rc<RefCell<Palette>>,
+    terminal_emulator_colors: Rc<RefCell<TermPalette>>,
     terminal_emulator_color_codes: Rc<RefCell<HashMap<usize, String>>>,
     character_cell_size: Rc<RefCell<Option<SizeInPixels>>>,
     connected_clients: Rc<RefCell<HashSet<ClientId>>>,
@@ -51,7 +51,7 @@ impl<'a> LayoutApplier<'a> {
         senders: &ThreadSenders,
         sixel_image_store: &Rc<RefCell<SixelImageStore>>,
         link_handler: &Rc<RefCell<LinkHandler>>,
-        terminal_emulator_colors: &Rc<RefCell<Palette>>,
+        terminal_emulator_colors: &Rc<RefCell<TermPalette>>,
         terminal_emulator_color_codes: &Rc<RefCell<HashMap<usize, String>>>,
         character_cell_size: &Rc<RefCell<Option<SizeInPixels>>>,
         connected_clients: &Rc<RefCell<HashSet<ClientId>>>,

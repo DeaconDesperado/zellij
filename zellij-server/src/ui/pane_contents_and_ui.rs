@@ -5,9 +5,7 @@ use crate::ui::boundaries::Boundaries;
 use crate::ui::pane_boundaries_frame::FrameParams;
 use crate::ClientId;
 use std::collections::HashMap;
-use zellij_utils::data::{
-    client_id_to_colors, single_client_color, InputMode, PaletteColor, Style,
-};
+use zellij_utils::data::{client_id_to_colors, InputMode, PaletteColor, Style};
 use zellij_utils::errors::prelude::*;
 pub struct PaneContentsAndUi<'a> {
     pane: &'a mut Box<dyn Pane>,
@@ -259,14 +257,14 @@ impl<'a> PaneContentsAndUi<'a> {
             match mode {
                 InputMode::Normal | InputMode::Locked => {
                     if session_is_mirrored || !self.multiple_users_exist_in_session {
-                        let colors = single_client_color(self.style.colors); // mirrored sessions only have one focused color
-                        Some(colors.0)
+                        let colors = self.style.theme_colors.selected_frame.fg;
+                        Some(colors)
                     } else {
                         let colors = client_id_to_colors(client_id, self.style.colors);
                         colors.map(|colors| colors.0)
                     }
                 },
-                _ => Some(self.style.colors.orange),
+                _ => Some(self.style.theme_colors.selected_frame.fg),
             }
         } else {
             None

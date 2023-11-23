@@ -16,7 +16,7 @@ use sysinfo::{ProcessExt, ProcessRefreshKind, System, SystemExt};
 use zellij_utils::{
     async_std, channels,
     channels::TrySendError,
-    data::Palette,
+    data::TermPalette,
     errors::prelude::*,
     input::command::{RunCommand, TerminalAction},
     interprocess,
@@ -501,7 +501,7 @@ pub trait ServerOsApi: Send + Sync {
         stream: LocalSocketStream,
     ) -> Result<IpcReceiverWithContext<ClientToServerMsg>>;
     fn remove_client(&mut self, client_id: ClientId) -> Result<()>;
-    fn load_palette(&self) -> Palette;
+    fn load_palette(&self) -> TermPalette;
     /// Returns the current working directory for a given pid
     fn get_cwd(&self, pid: Pid) -> Option<PathBuf>;
     /// Returns the current working directory for multiple pids
@@ -734,7 +734,7 @@ impl ServerOsApi for ServerOsInputOutput {
         Ok(())
     }
 
-    fn load_palette(&self) -> Palette {
+    fn load_palette(&self) -> TermPalette {
         default_palette()
     }
 

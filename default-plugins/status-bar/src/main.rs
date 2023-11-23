@@ -83,7 +83,7 @@ pub struct SegmentStyle {
 // we need different colors from palette for the default theme
 // plus here we can add new sources in the future, like Theme
 // that can be defined in the config perhaps
-fn color_elements(palette: Palette, different_color_alternates: bool) -> ColoredElements {
+fn color_elements(palette: TermPalette, different_color_alternates: bool) -> ColoredElements {
     let background = match palette.theme_hue {
         ThemeHue::Dark => palette.black,
         ThemeHue::Light => palette.white,
@@ -407,7 +407,7 @@ pub fn action_key_group(keymap: &[(Key, Vec<Action>)], actions: &[&[Action]]) ->
 /// type.
 pub fn style_key_with_modifier(
     keyvec: &[Key],
-    palette: &Palette,
+    palette: &TermPalette,
     background: Option<PaletteColor>,
 ) -> Vec<ANSIString<'static>> {
     // Nothing to do, quit...
@@ -678,8 +678,8 @@ pub mod tests {
         assert_eq!(ret, vec![Key::Ctrl('d'), Key::Ctrl('b')]);
     }
 
-    fn get_palette() -> Palette {
-        Palette::default()
+    fn get_palette() -> TermPalette {
+        TermPalette::default()
     }
 
     #[test]

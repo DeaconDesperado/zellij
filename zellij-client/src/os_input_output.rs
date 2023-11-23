@@ -13,7 +13,7 @@ use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::{io, thread, time};
 use zellij_utils::{
-    data::Palette,
+    data::TermPalette,
     errors::ErrorContext,
     ipc::{ClientToServerMsg, IpcReceiverWithContext, IpcSenderWithContext, ServerToClientMsg},
     shared::default_palette,
@@ -109,7 +109,7 @@ pub trait ClientOsApi: Send + Sync {
     fn handle_signals(&self, sigwinch_cb: Box<dyn Fn()>, quit_cb: Box<dyn Fn()>);
     /// Establish a connection with the server socket.
     fn connect_to_server(&self, path: &Path);
-    fn load_palette(&self) -> Palette;
+    fn load_palette(&self) -> TermPalette;
     fn enable_mouse(&self) -> Result<()>;
     fn disable_mouse(&self) -> Result<()>;
     // Repeatedly send action, until stdin is readable again
@@ -248,7 +248,7 @@ impl ClientOsApi for ClientOsInputOutput {
         *self.send_instructions_to_server.lock().unwrap() = Some(sender);
         *self.receive_instructions_from_server.lock().unwrap() = Some(receiver);
     }
-    fn load_palette(&self) -> Palette {
+    fn load_palette(&self) -> TermPalette {
         // this was removed because termbg doesn't release stdin in certain scenarios (we know of
         // windows terminal and FreeBSD): https://github.com/zellij-org/zellij/issues/538
         //

@@ -938,7 +938,7 @@ fn serialize_mode_update_event() {
 
 #[test]
 fn serialize_mode_update_event_with_non_default_values() {
-    use crate::data::{Direction, Palette, PaletteColor, ThemeHue};
+    use crate::data::{Direction, PaletteColor, TermPalette, ThemeHue};
     use prost::Message;
     let mode_update_event = Event::ModeUpdate(ModeInfo {
         mode: InputMode::Locked,
@@ -972,7 +972,7 @@ fn serialize_mode_update_event_with_non_default_values() {
             ),
         ],
         style: Style {
-            colors: Palette {
+            colors: TermPalette {
                 source: crate::data::PaletteSource::Default,
                 theme_hue: ThemeHue::Light,
                 fg: PaletteColor::Rgb((1, 1, 1)),

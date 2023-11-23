@@ -1,7 +1,7 @@
 use std::fmt::{Display, Error, Formatter};
 
 use zellij_utils::{
-    data::{Palette, PaletteColor},
+    data::{PaletteColor, TermPalette},
     errors::prelude::*,
 };
 
@@ -24,7 +24,7 @@ pub struct LoadingIndication {
     error: Option<String>,
     animation_offset: usize,
     plugin_name: String,
-    terminal_emulator_colors: Option<Palette>,
+    terminal_emulator_colors: Option<TermPalette>,
     override_previous_error: bool,
 }
 
@@ -39,7 +39,7 @@ impl LoadingIndication {
     pub fn set_name(&mut self, plugin_name: String) {
         self.plugin_name = plugin_name;
     }
-    pub fn with_colors(mut self, terminal_emulator_colors: Palette) -> Self {
+    pub fn with_colors(mut self, terminal_emulator_colors: TermPalette) -> Self {
         self.terminal_emulator_colors = Some(terminal_emulator_colors);
         self
     }

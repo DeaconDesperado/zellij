@@ -16,7 +16,7 @@ fn populate_tabs_in_tab_line(
     tabs_after_active: &mut Vec<LinePart>,
     tabs_to_render: &mut Vec<LinePart>,
     cols: usize,
-    palette: Palette,
+    palette: TermPalette,
     capabilities: PluginCapabilities,
 ) {
     let mut middle_size = get_current_title_len(tabs_to_render);
@@ -108,7 +108,7 @@ fn populate_tabs_in_tab_line(
 
 fn left_more_message(
     tab_count_to_the_left: usize,
-    palette: Palette,
+    palette: TermPalette,
     separator: &str,
     tab_index: usize,
 ) -> LinePart {
@@ -141,7 +141,7 @@ fn left_more_message(
 
 fn right_more_message(
     tab_count_to_the_right: usize,
-    palette: Palette,
+    palette: TermPalette,
     separator: &str,
     tab_index: usize,
 ) -> LinePart {
@@ -171,7 +171,7 @@ fn right_more_message(
     }
 }
 
-fn tab_line_prefix(session_name: Option<&str>, palette: Palette, cols: usize) -> Vec<LinePart> {
+fn tab_line_prefix(session_name: Option<&str>, palette: TermPalette, cols: usize) -> Vec<LinePart> {
     let prefix_text = " Zellij ".to_string();
 
     let prefix_text_len = prefix_text.chars().count();
@@ -221,7 +221,7 @@ pub fn tab_line(
     mut all_tabs: Vec<LinePart>,
     active_tab_index: usize,
     cols: usize,
-    palette: Palette,
+    palette: TermPalette,
     capabilities: PluginCapabilities,
     hide_session_name: bool,
 ) -> Vec<LinePart> {
