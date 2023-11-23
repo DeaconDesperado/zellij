@@ -3,7 +3,7 @@ use super::generated_api::api::style::{
     Palette as ProtobufPalette, RgbColorPayload as ProtobufRgbColorPayload, Style as ProtobufStyle,
     ThemeHue as ProtobufThemeHue,
 };
-use crate::data::{Palette, PaletteColor, Style, ThemeHue};
+use crate::data::{PaletteColor, Style, TermPalette, ThemeHue};
 use crate::errors::prelude::*;
 
 use std::convert::TryFrom;
@@ -16,6 +16,7 @@ impl TryFrom<ProtobufStyle> for Style {
                 .palette
                 .ok_or("malformed style payload")?
                 .try_into()?,
+            theme_colors: Default::default(),
             rounded_corners: protobuf_style.rounded_corners,
             hide_session_name: protobuf_style.hide_session_name,
         })
@@ -33,10 +34,10 @@ impl TryFrom<Style> for ProtobufStyle {
     }
 }
 
-impl TryFrom<ProtobufPalette> for Palette {
+impl TryFrom<ProtobufPalette> for TermPalette {
     type Error = &'static str;
     fn try_from(protobuf_palette: ProtobufPalette) -> Result<Self, &'static str> {
-        Ok(Palette {
+        Ok(TermPalette {
             theme_hue: ProtobufThemeHue::from_i32(protobuf_palette.theme_hue)
                 .ok_or("malformed theme_hue payload for Palette")?
                 .try_into()?,
@@ -113,9 +114,9 @@ impl TryFrom<ProtobufPalette> for Palette {
     }
 }
 
-impl TryFrom<Palette> for ProtobufPalette {
+impl TryFrom<TermPalette> for ProtobufPalette {
     type Error = &'static str;
-    fn try_from(palette: Palette) -> Result<Self, &'static str> {
+    fn try_from(palette: TermPalette) -> Result<Self, &'static str> {
         let theme_hue: ProtobufThemeHue = palette
             .theme_hue
             .try_into()

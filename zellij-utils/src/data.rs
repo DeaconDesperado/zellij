@@ -1,5 +1,6 @@
 use crate::input::actions::Action;
 use crate::input::config::ConversionError;
+use crate::shared::default_palette;
 use clap::ArgEnum;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap, HashSet};
@@ -13,7 +14,7 @@ pub type ClientId = u16; // TODO: merge with crate type?
 
 pub fn client_id_to_colors(
     client_id: ClientId,
-    colors: Palette,
+    colors: TermPalette,
 ) -> Option<(PaletteColor, PaletteColor)> {
     // (primary color, secondary color)
     match client_id {
@@ -31,7 +32,7 @@ pub fn client_id_to_colors(
     }
 }
 
-pub fn single_client_color(colors: Palette) -> (PaletteColor, PaletteColor) {
+pub fn single_client_color(colors: TermPalette) -> (PaletteColor, PaletteColor) {
     (colors.green, colors.black)
 }
 
@@ -700,8 +701,8 @@ impl Default for PaletteSource {
         PaletteSource::Default
     }
 }
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Default)]
-pub struct Palette {
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
+pub struct TermPalette {
     pub source: PaletteSource,
     pub theme_hue: ThemeHue,
     pub fg: PaletteColor,
@@ -723,9 +724,31 @@ pub struct Palette {
     pub brown: PaletteColor,
 }
 
+impl Default for TermPalette {
+    fn default() -> Self {
+        default_palette()
+    }
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Default)]
+pub struct StyleSpec {
+    pub fg: PaletteColor,
+    pub bg: PaletteColor,
+    //TODO: bold ul
+}
+
+#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Default)]
+pub struct ThemeColorAssignments {
+    pub selected_ribbon: StyleSpec,
+    pub unselected_ribbon: StyleSpec,
+    pub key: StyleSpec,
+    pub key_modifier: StyleSpec,
+    pub selected_frame: StyleSpec,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub struct Style {
-    pub colors: Palette,
+    pub colors: ThemeColorAssignments,
     pub rounded_corners: bool,
     pub hide_session_name: bool,
 }

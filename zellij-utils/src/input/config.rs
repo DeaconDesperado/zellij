@@ -1,4 +1,4 @@
-use crate::data::Palette;
+use crate::data::{TermPalette, ThemeColorAssignments};
 use miette::{Diagnostic, LabeledSpan, NamedSource, SourceCode};
 use std::fs::File;
 use std::io::{self, Read};
@@ -10,7 +10,7 @@ use std::convert::TryFrom;
 use super::keybinds::Keybinds;
 use super::options::Options;
 use super::plugins::{PluginsConfig, PluginsConfigError};
-use super::theme::{Themes, UiConfig};
+use super::theme::{Theme, Themes, UiConfig};
 use crate::cli::{CliArgs, Command};
 use crate::envs::EnvironmentVariables;
 use crate::{home, setup};
@@ -160,12 +160,13 @@ impl TryFrom<&CliArgs> for Config {
 }
 
 impl Config {
-    pub fn theme_config(&self, opts: &Options) -> Option<Palette> {
+    pub fn theme_config(&self, opts: &Options) -> Option {
         match &opts.theme {
             Some(theme_name) => self.themes.get_theme(theme_name).map(|theme| theme.palette),
             None => self.themes.get_theme("default").map(|theme| theme.palette),
         }
     }
+
     /// Gets default configuration from assets
     pub fn from_default_assets() -> ConfigResult {
         let cfg = String::from_utf8(setup::DEFAULT_CONFIG.to_vec())?;
@@ -227,7 +228,7 @@ impl Config {
 #[cfg(test)]
 mod config_test {
     use super::*;
-    use crate::data::{InputMode, Palette, PaletteColor, PluginTag};
+    use crate::data::{InputMode, PaletteColor, PluginTag, TermPalette};
     use crate::input::layout::RunPluginLocation;
     use crate::input::options::{Clipboard, OnForceClose};
     use crate::input::plugins::{PluginConfig, PluginType, PluginsConfig};
@@ -438,7 +439,7 @@ mod config_test {
         expected_themes.insert(
             "dracula".into(),
             Theme {
-                palette: Palette {
+                palette: TermPalette {
                     fg: PaletteColor::Rgb((248, 248, 242)),
                     bg: PaletteColor::Rgb((40, 42, 54)),
                     red: PaletteColor::Rgb((255, 85, 85)),
@@ -495,7 +496,7 @@ mod config_test {
         expected_themes.insert(
             "dracula".into(),
             Theme {
-                palette: Palette {
+                palette: TermPalette {
                     fg: PaletteColor::Rgb((248, 248, 242)),
                     bg: PaletteColor::Rgb((40, 42, 54)),
                     red: PaletteColor::Rgb((255, 85, 85)),
@@ -514,7 +515,7 @@ mod config_test {
         expected_themes.insert(
             "nord".into(),
             Theme {
-                palette: Palette {
+                palette: TermPalette {
                     fg: PaletteColor::Rgb((216, 222, 233)),
                     bg: PaletteColor::Rgb((46, 52, 64)),
                     black: PaletteColor::Rgb((59, 66, 82)),
@@ -558,7 +559,7 @@ mod config_test {
         expected_themes.insert(
             "eight_bit_theme".into(),
             Theme {
-                palette: Palette {
+                palette: TermPalette {
                     fg: PaletteColor::EightBit(248),
                     bg: PaletteColor::EightBit(40),
                     red: PaletteColor::EightBit(255),

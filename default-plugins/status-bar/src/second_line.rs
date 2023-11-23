@@ -17,7 +17,7 @@ fn full_length_shortcut(
     is_first_shortcut: bool,
     key: Vec<Key>,
     action: &str,
-    palette: Palette,
+    palette: TermPalette,
 ) -> LinePart {
     if key.is_empty() {
         return LinePart::default();
@@ -45,7 +45,7 @@ fn full_length_shortcut(
     }
 }
 
-fn locked_interface_indication(palette: Palette) -> LinePart {
+fn locked_interface_indication(palette: TermPalette) -> LinePart {
     let locked_text = " -- INTERFACE LOCKED -- ";
     let locked_text_len = locked_text.chars().count();
     let text_color = palette_match!(match palette.theme_hue {
@@ -349,7 +349,7 @@ pub fn keybinds(help: &ModeInfo, tip_name: &str, max_width: usize) -> LinePart {
     best_effort_shortcut_list(help, tip_body.short, max_width)
 }
 
-pub fn text_copied_hint(palette: &Palette, copy_destination: CopyDestination) -> LinePart {
+pub fn text_copied_hint(palette: &TermPalette, copy_destination: CopyDestination) -> LinePart {
     let green_color = palette_match!(palette.green);
     let hint = match copy_destination {
         CopyDestination::Command => "Text piped to external command",
@@ -365,7 +365,7 @@ pub fn text_copied_hint(palette: &Palette, copy_destination: CopyDestination) ->
     }
 }
 
-pub fn system_clipboard_error(palette: &Palette) -> LinePart {
+pub fn system_clipboard_error(palette: &TermPalette) -> LinePart {
     let hint = " Error using the system clipboard.";
     let red_color = palette_match!(palette.red);
     LinePart {
@@ -374,7 +374,7 @@ pub fn system_clipboard_error(palette: &Palette) -> LinePart {
     }
 }
 
-pub fn fullscreen_panes_to_hide(palette: &Palette, panes_to_hide: usize) -> LinePart {
+pub fn fullscreen_panes_to_hide(palette: &TermPalette, panes_to_hide: usize) -> LinePart {
     let text_color = palette_match!(match palette.theme_hue {
         ThemeHue::Dark => palette.white,
         ThemeHue::Light => palette.black,
@@ -472,7 +472,7 @@ pub fn floating_panes_are_visible(mode_info: &ModeInfo) -> LinePart {
     }
 }
 
-pub fn locked_fullscreen_panes_to_hide(palette: &Palette, panes_to_hide: usize) -> LinePart {
+pub fn locked_fullscreen_panes_to_hide(palette: &TermPalette, panes_to_hide: usize) -> LinePart {
     let text_color = palette_match!(match palette.theme_hue {
         ThemeHue::Dark => palette.white,
         ThemeHue::Light => palette.black,
@@ -507,7 +507,7 @@ pub fn locked_fullscreen_panes_to_hide(palette: &Palette, panes_to_hide: usize) 
     }
 }
 
-pub fn locked_floating_panes_are_visible(palette: &Palette) -> LinePart {
+pub fn locked_floating_panes_are_visible(palette: &TermPalette) -> LinePart {
     let white_color = match palette.white {
         PaletteColor::Rgb((r, g, b)) => RGB(r, g, b),
         PaletteColor::EightBit(color) => Fixed(color),
@@ -554,8 +554,8 @@ mod tests {
         string.to_string()
     }
 
-    fn get_palette() -> Palette {
-        Palette::default()
+    fn get_palette() -> TermPalette {
+        TermPalette::default()
     }
 
     #[test]

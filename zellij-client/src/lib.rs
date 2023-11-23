@@ -199,6 +199,7 @@ pub fn start_client(
         size: full_screen_ws,
         style: Style {
             colors: palette,
+            theme_colors: Default::default(),
             rounded_corners: config.ui.pane_frames.rounded_corners,
             hide_session_name: config.ui.pane_frames.hide_session_name,
         },

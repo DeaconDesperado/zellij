@@ -46,7 +46,9 @@ use crate::{
     ClientId, ServerInstruction,
 };
 use zellij_utils::{
-    data::{Event, InputMode, ModeInfo, Palette, PaletteColor, PluginCapabilities, Style, TabInfo},
+    data::{
+        Event, InputMode, ModeInfo, PaletteColor, PluginCapabilities, Style, TabInfo, TermPalette,
+    },
     errors::{ContextType, ScreenContext},
     input::{get_mode_info, options::Options},
     ipc::{ClientAttributes, PixelDimensions, ServerToClientMsg},
@@ -551,7 +553,7 @@ pub(crate) struct Screen {
     sixel_image_store: Rc<RefCell<SixelImageStore>>,
     /// The overlay that is drawn on top of [`Pane`]'s', [`Tab`]'s and the [`Screen`]
     overlay: OverlayWindow,
-    terminal_emulator_colors: Rc<RefCell<Palette>>,
+    terminal_emulator_colors: Rc<RefCell<TermPalette>>,
     terminal_emulator_color_codes: Rc<RefCell<HashMap<usize, String>>>,
     connected_clients: Rc<RefCell<HashSet<ClientId>>>,
     /// The indices of this [`Screen`]'s active [`Tab`]s.
@@ -616,7 +618,7 @@ impl Screen {
             active_tab_indices: BTreeMap::new(),
             tabs: BTreeMap::new(),
             overlay: OverlayWindow::default(),
-            terminal_emulator_colors: Rc::new(RefCell::new(Palette::default())),
+            terminal_emulator_colors: Rc::new(RefCell::new(TermPalette::default())),
             terminal_emulator_color_codes: Rc::new(RefCell::new(HashMap::new())),
             tab_history: BTreeMap::new(),
             mode_info: BTreeMap::new(),

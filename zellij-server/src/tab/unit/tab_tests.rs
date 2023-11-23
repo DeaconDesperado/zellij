@@ -20,7 +20,7 @@ use std::os::unix::io::RawFd;
 use std::rc::Rc;
 
 use zellij_utils::{
-    data::{ModeInfo, Palette, Style},
+    data::{ModeInfo, Style, TermPalette},
     input::command::{RunCommand, TerminalAction},
     interprocess::local_socket::LocalSocketStream,
     ipc::{ClientToServerMsg, ServerToClientMsg},
@@ -83,7 +83,7 @@ impl ServerOsApi for FakeInputOutput {
     fn remove_client(&mut self, _client_id: ClientId) -> Result<()> {
         unimplemented!()
     }
-    fn load_palette(&self) -> Palette {
+    fn load_palette(&self) -> TermPalette {
         unimplemented!()
     }
     fn get_cwd(&self, _pid: Pid) -> Option<PathBuf> {
@@ -160,7 +160,7 @@ fn create_new_tab(size: Size) -> Tab {
     let character_cell_info = Rc::new(RefCell::new(None));
     connected_clients.insert(client_id);
     let connected_clients = Rc::new(RefCell::new(connected_clients));
-    let terminal_emulator_colors = Rc::new(RefCell::new(Palette::default()));
+    let terminal_emulator_colors = Rc::new(RefCell::new(TermPalette::default()));
     let copy_options = CopyOptions::default();
     let sixel_image_store = Rc::new(RefCell::new(SixelImageStore::default()));
     let terminal_emulator_color_codes = Rc::new(RefCell::new(HashMap::new()));
@@ -222,7 +222,7 @@ fn create_new_tab_with_layout(size: Size, layout: TiledPaneLayout) -> Tab {
     let character_cell_info = Rc::new(RefCell::new(None));
     connected_clients.insert(client_id);
     let connected_clients = Rc::new(RefCell::new(connected_clients));
-    let terminal_emulator_colors = Rc::new(RefCell::new(Palette::default()));
+    let terminal_emulator_colors = Rc::new(RefCell::new(TermPalette::default()));
     let copy_options = CopyOptions::default();
     let sixel_image_store = Rc::new(RefCell::new(SixelImageStore::default()));
     let terminal_emulator_color_codes = Rc::new(RefCell::new(HashMap::new()));
@@ -290,7 +290,7 @@ fn create_new_tab_with_cell_size(
     let mut connected_clients = HashSet::new();
     connected_clients.insert(client_id);
     let connected_clients = Rc::new(RefCell::new(connected_clients));
-    let terminal_emulator_colors = Rc::new(RefCell::new(Palette::default()));
+    let terminal_emulator_colors = Rc::new(RefCell::new(TermPalette::default()));
     let copy_options = CopyOptions::default();
     let sixel_image_store = Rc::new(RefCell::new(SixelImageStore::default()));
     let terminal_emulator_color_codes = Rc::new(RefCell::new(HashMap::new()));

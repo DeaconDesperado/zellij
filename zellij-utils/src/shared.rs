@@ -2,7 +2,7 @@
 
 use std::{iter, str::from_utf8};
 
-use crate::data::{Palette, PaletteColor, PaletteSource, ThemeHue};
+use crate::data::{PaletteColor, PaletteSource, TermPalette, ThemeHue};
 use crate::envs::get_session_name;
 use colorsys::Rgb;
 use strip_ansi_escapes::strip;
@@ -87,8 +87,8 @@ pub fn _hex_to_rgb(hex: &str) -> (u8, u8, u8) {
         .into()
 }
 
-pub fn default_palette() -> Palette {
-    Palette {
+pub fn default_palette() -> TermPalette {
+    TermPalette {
         source: PaletteSource::Default,
         theme_hue: ThemeHue::Dark,
         fg: PaletteColor::EightBit(colors::BRIGHT_GRAY),
@@ -112,6 +112,7 @@ pub fn default_palette() -> Palette {
 }
 
 // Dark magic
+#[deprecated(since = "0.39.2", note = "Hues are now handled via dedicated themes")]
 pub fn detect_theme_hue(bg: PaletteColor) -> ThemeHue {
     match bg {
         PaletteColor::Rgb((r, g, b)) => {

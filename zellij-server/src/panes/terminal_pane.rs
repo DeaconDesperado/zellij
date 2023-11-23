@@ -16,7 +16,7 @@ use std::time::{self, Instant};
 use zellij_utils::input::command::RunCommand;
 use zellij_utils::pane_size::Offset;
 use zellij_utils::{
-    data::{InputMode, Palette, PaletteColor, PaneId as ZellijUtilsPaneId, Style},
+    data::{InputMode, Palette, PaletteColor, PaneId as ZellijUtilsPaneId, Style, TermPalette},
     errors::prelude::*,
     input::layout::Run,
     pane_size::PaneGeom,
@@ -797,7 +797,7 @@ impl TerminalPane {
         link_handler: Rc<RefCell<LinkHandler>>,
         character_cell_size: Rc<RefCell<Option<SizeInPixels>>>,
         sixel_image_store: Rc<RefCell<SixelImageStore>>,
-        terminal_emulator_colors: Rc<RefCell<Palette>>,
+        terminal_emulator_colors: Rc<RefCell<TermPalette>>,
         terminal_emulator_color_codes: Rc<RefCell<HashMap<usize, String>>>,
         initial_pane_title: Option<String>,
         invoked_with: Option<Run>,

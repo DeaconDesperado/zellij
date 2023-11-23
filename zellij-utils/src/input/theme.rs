@@ -7,7 +7,7 @@ use std::{
     fmt,
 };
 
-use crate::data::Palette;
+use crate::data::{PaletteColor, TermPalette, ThemeColorAssignments};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Deserialize, Serialize)]
 pub struct UiConfig {
@@ -37,8 +37,13 @@ impl FrameConfig {
     }
 }
 
+pub enum ThemeVariant {
+    Term(TermPalette),
+    User(Theme),
+}
+
 #[derive(Clone, PartialEq, Default)]
-pub struct Themes(HashMap<String, Theme>);
+pub struct Themes(HashMap<String, ThemeVariant>);
 
 impl fmt::Debug for Themes {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -51,7 +56,7 @@ impl fmt::Debug for Themes {
 }
 
 impl Themes {
-    pub fn from_data(theme_data: HashMap<String, Theme>) -> Self {
+    pub fn from_data(theme_data: HashMap<String, ThemeVariant>) -> Self {
         Themes(theme_data)
     }
     pub fn insert(&mut self, theme_name: String, theme: Theme) {
@@ -69,10 +74,12 @@ impl Themes {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+type Palette = HashMap<String, PaletteColor>;
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Theme {
-    #[serde(flatten)]
     pub palette: Palette,
+    pub styling: ThemeColorAssignments,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]

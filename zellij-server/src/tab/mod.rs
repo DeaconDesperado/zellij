@@ -46,7 +46,7 @@ use std::{
     str,
 };
 use zellij_utils::{
-    data::{Event, InputMode, ModeInfo, Palette, PaletteColor, Style},
+    data::{Event, InputMode, ModeInfo, PaletteColor, Style, TermPalette},
     input::{
         command::TerminalAction,
         layout::{
@@ -173,7 +173,7 @@ pub(crate) struct Tab {
     focus_pane_id: Option<PaneId>,
     copy_on_select: bool,
     last_mouse_hold_position: Option<Position>,
-    terminal_emulator_colors: Rc<RefCell<Palette>>,
+    terminal_emulator_colors: Rc<RefCell<TermPalette>>,
     terminal_emulator_color_codes: Rc<RefCell<HashMap<usize, String>>>,
     pids_waiting_resize: HashSet<u32>, // u32 is the terminal_id
     cursor_positions_and_shape: HashMap<ClientId, (usize, usize, String)>, // (x_position,
@@ -196,7 +196,7 @@ pub(crate) struct TabData {
     pub name: String,
     pub active: bool,
     pub mode_info: ModeInfo,
-    pub colors: Palette,
+    pub colors: TermPalette,
 }
 
 // FIXME: Use a struct that has a pane_type enum, to reduce all of the duplication
@@ -530,7 +530,7 @@ impl Tab {
         session_is_mirrored: bool,
         client_id: ClientId,
         copy_options: CopyOptions,
-        terminal_emulator_colors: Rc<RefCell<Palette>>,
+        terminal_emulator_colors: Rc<RefCell<TermPalette>>,
         terminal_emulator_color_codes: Rc<RefCell<HashMap<usize, String>>>,
         swap_layouts: (Vec<SwapTiledLayout>, Vec<SwapFloatingLayout>),
         default_shell: Option<PathBuf>,

@@ -2,7 +2,7 @@ use super::input_loop;
 use crate::stdin_ansi_parser::StdinAnsiParser;
 use crate::stdin_loop;
 use zellij_utils::anyhow::Result;
-use zellij_utils::data::{Direction, InputMode, Palette};
+use zellij_utils::data::{Direction, InputMode, TermPalette};
 use zellij_utils::input::actions::Action;
 use zellij_utils::input::config::Config;
 use zellij_utils::input::options::Options;
@@ -16,7 +16,7 @@ use crate::{
     ClientInstruction, CommandIsExecuting,
 };
 
-use ::insta::assert_snapshot;
+use insta::assert_snapshot;
 use std::path::Path;
 
 use std::io;
@@ -180,7 +180,7 @@ impl ClientOsApi for FakeClientOsApi {
     fn connect_to_server(&self, _path: &Path) {
         unimplemented!()
     }
-    fn load_palette(&self) -> Palette {
+    fn load_palette(&self) -> TermPalette {
         unimplemented!()
     }
     fn enable_mouse(&self) -> Result<()> {

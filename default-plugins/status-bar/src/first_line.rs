@@ -234,7 +234,7 @@ fn key_indicators(
     line_part
 }
 
-fn swap_layout_keycode(mode_info: &ModeInfo, palette: &Palette) -> LinePart {
+fn swap_layout_keycode(mode_info: &ModeInfo, palette: &TermPalette) -> LinePart {
     let mode_keybinds = mode_info.get_mode_keybinds();
     let prev_next_keys = action_key_group(
         &mode_keybinds,
@@ -254,7 +254,7 @@ fn swap_layout_status(
     is_swap_layout_damaged: bool,
     mode_info: &ModeInfo,
     colored_elements: ColoredElements,
-    palette: &Palette,
+    palette: &TermPalette,
     separator: &str,
 ) -> Option<LinePart> {
     match swap_layout_name {
@@ -575,7 +575,7 @@ mod tests {
     use super::*;
 
     fn colored_elements() -> ColoredElements {
-        let palette = Palette::default();
+        let palette = TermPalette::default();
         color_elements(palette, false)
     }
 
