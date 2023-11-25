@@ -11,7 +11,7 @@ pub fn ribbon(
     arrow_fonts: bool,
     component_coordinates: Option<Coordinates>,
 ) -> Vec<u8> {
-    let colors = style.colors;
+    let colors = style.theme;
     let (first_arrow_styles, text_style, last_arrow_styles) = if content.selected {
         (
             character_style(colors.black, colors.green),
@@ -47,19 +47,19 @@ pub fn ribbon(
 
 pub fn emphasis_variants_for_ribbon(style: &Style) -> [PaletteColor; 4] {
     [
-        style.colors.red,
-        style.colors.white,
-        style.colors.blue,
-        style.colors.magenta,
+        style.theme.red,
+        style.theme.white,
+        style.theme.blue,
+        style.theme.magenta,
     ]
 }
 
 pub fn emphasis_variants_for_selected_ribbon(style: &Style) -> [PaletteColor; 4] {
     [
-        style.colors.red,
-        style.colors.orange,
-        style.colors.magenta,
-        style.colors.blue,
+        style.theme.red,
+        style.theme.orange,
+        style.theme.magenta,
+        style.theme.blue,
     ]
 }
 

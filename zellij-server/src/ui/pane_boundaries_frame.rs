@@ -135,7 +135,7 @@ impl PaneFrame {
         self.color = Some(color);
     }
     fn client_cursor(&self, client_id: ClientId) -> Vec<TerminalCharacter> {
-        let color = client_id_to_colors(client_id, self.style.colors);
+        let color = client_id_to_colors(client_id, self.style.theme);
         background_color(" ", color.map(|c| c.0))
     }
     fn get_corner(&self, corner: &'static str) -> &'static str {
@@ -791,9 +791,9 @@ impl PaneFrame {
                 let exited_text = "EXIT CODE: ";
                 let exit_code_text = format!("{}", exit_code);
                 let exit_code_color = if exit_code == 0 {
-                    self.style.colors.green
+                    self.style.theme.green
                 } else {
-                    self.style.colors.red
+                    self.style.theme.red
                 };
                 let right_bracket = " ] ";
                 first_part.append(&mut foreground_color(left_bracket, self.color));
@@ -819,7 +819,7 @@ impl PaneFrame {
                 first_part.append(&mut foreground_color(left_bracket, self.color));
                 first_part.append(&mut foreground_color(
                     exited_text,
-                    Some(self.style.colors.red),
+                    Some(self.style.theme.red),
                 ));
                 first_part.append(&mut foreground_color(right_bracket, self.color));
                 (
@@ -854,7 +854,7 @@ impl PaneFrame {
         second_part.append(&mut foreground_color(left_enter_bracket, self.color));
         second_part.append(&mut foreground_color(
             enter_text,
-            Some(self.style.colors.orange),
+            Some(self.style.theme.orange),
         ));
         second_part.append(&mut foreground_color(right_enter_bracket, self.color));
         second_part.append(&mut foreground_color(enter_tip, self.color));
@@ -862,7 +862,7 @@ impl PaneFrame {
         second_part.append(&mut foreground_color(left_esc_bracket, self.color));
         second_part.append(&mut foreground_color(
             esc_text,
-            Some(self.style.colors.orange),
+            Some(self.style.theme.orange),
         ));
         second_part.append(&mut foreground_color(right_esc_bracket, self.color));
         second_part.append(&mut foreground_color(esc_tip, self.color));
@@ -870,7 +870,7 @@ impl PaneFrame {
         second_part.append(&mut foreground_color(left_break_bracket, self.color));
         second_part.append(&mut foreground_color(
             break_text,
-            Some(self.style.colors.orange),
+            Some(self.style.theme.orange),
         ));
         second_part.append(&mut foreground_color(right_break_bracket, self.color));
         second_part.append(&mut foreground_color(break_tip, self.color));
