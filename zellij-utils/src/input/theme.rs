@@ -74,7 +74,13 @@ impl Themes {
     }
 }
 
-type Palette = HashMap<String, PaletteColor>;
+pub type Palette = HashMap<str, PaletteColor>;
+
+impl Default for Palette {
+    fn default() -> Self {
+        HashMap::from([("bg",)])
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Theme {
