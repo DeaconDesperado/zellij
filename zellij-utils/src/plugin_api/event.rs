@@ -972,7 +972,7 @@ fn serialize_mode_update_event_with_non_default_values() {
             ),
         ],
         style: Style {
-            colors: TermPalette {
+            theme: TermPalette {
                 source: crate::data::PaletteSource::Default,
                 theme_hue: ThemeHue::Light,
                 fg: PaletteColor::Rgb((1, 1, 1)),

@@ -198,7 +198,7 @@ pub fn start_client(
     let client_attributes = ClientAttributes {
         size: full_screen_ws,
         style: Style {
-            colors: palette,
+            theme: palette,
             theme_colors: Default::default(),
             rounded_corners: config.ui.pane_frames.rounded_corners,
             hide_session_name: config.ui.pane_frames.hide_session_name,

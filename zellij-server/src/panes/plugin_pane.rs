@@ -111,7 +111,7 @@ impl PluginPane {
         arrow_fonts: bool,
         styled_underlines: bool,
     ) -> Self {
-        let loading_indication = LoadingIndication::new(title.clone()).with_colors(style.colors);
+        let loading_indication = LoadingIndication::new(title.clone()).with_colors(style.theme);
         let initial_loading_message = loading_indication.to_string();
         let mut plugin = PluginPane {
             pid,
@@ -578,7 +578,7 @@ impl Pane for PluginPane {
             .unwrap();
     }
     fn add_red_pane_frame_color_override(&mut self, error_text: Option<String>) {
-        self.pane_frame_color_override = Some((self.style.colors.red, error_text));
+        self.pane_frame_color_override = Some((self.style.theme.red, error_text));
     }
     fn clear_pane_frame_color_override(&mut self) {
         self.pane_frame_color_override = None;
@@ -657,10 +657,10 @@ impl PluginPane {
         }
     }
     fn display_request_permission_message(&self, plugin_permission: &PluginPermission) -> String {
-        let bold_white = style!(self.style.colors.white).bold();
-        let cyan = style!(self.style.colors.cyan).bold();
-        let orange = style!(self.style.colors.orange).bold();
-        let green = style!(self.style.colors.green).bold();
+        let bold_white = style!(self.style.theme.white).bold();
+        let cyan = style!(self.style.theme.cyan).bold();
+        let orange = style!(self.style.theme.orange).bold();
+        let green = style!(self.style.theme.green).bold();
 
         let mut messages = String::new();
         let permissions: BTreeSet<PermissionType> =

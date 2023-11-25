@@ -133,7 +133,7 @@ impl<'a> PaneContentsAndUi<'a> {
                 .with_context(|| {
                     format!("failed to render fake cursor if needed for client {client_id}")
                 })?;
-            if let Some(colors) = client_id_to_colors(*fake_cursor_client_id, self.style.colors) {
+            if let Some(colors) = client_id_to_colors(*fake_cursor_client_id, self.style.theme) {
                 if let Some(vte_output) = self.pane.render_fake_cursor(colors.0, colors.1) {
                     self.output.add_post_vte_instruction_to_client(
                         client_id,
@@ -260,7 +260,7 @@ impl<'a> PaneContentsAndUi<'a> {
                         let colors = self.style.theme_colors.selected_frame.fg;
                         Some(colors)
                     } else {
-                        let colors = client_id_to_colors(client_id, self.style.colors);
+                        let colors = client_id_to_colors(client_id, self.style.theme);
                         colors.map(|colors| colors.0)
                     }
                 },

@@ -248,9 +248,9 @@ impl ZellijPlugin for State {
         let first_line = first_line(&self.mode_info, active_tab, cols, separator);
         let second_line = self.second_line(cols);
 
-        let background = match self.mode_info.style.colors.theme_hue {
-            ThemeHue::Dark => self.mode_info.style.colors.black,
-            ThemeHue::Light => self.mode_info.style.colors.white,
+        let background = match self.mode_info.style.theme.theme_hue {
+            ThemeHue::Dark => self.mode_info.style.theme.black,
+            ThemeHue::Light => self.mode_info.style.theme.white,
         };
 
         // [48;5;238m is white background, [0K is so that it fills the rest of the line
@@ -291,18 +291,18 @@ impl State {
         let active_tab = self.tabs.iter().find(|t| t.active);
 
         if let Some(copy_destination) = self.text_copy_destination {
-            text_copied_hint(&self.mode_info.style.colors, copy_destination)
+            text_copied_hint(&self.mode_info.style.theme, copy_destination)
         } else if self.display_system_clipboard_failure {
-            system_clipboard_error(&self.mode_info.style.colors)
+            system_clipboard_error(&self.mode_info.style.theme)
         } else if let Some(active_tab) = active_tab {
             if active_tab.is_fullscreen_active {
                 match self.mode_info.mode {
                     InputMode::Normal => fullscreen_panes_to_hide(
-                        &self.mode_info.style.colors,
+                        &self.mode_info.style.theme,
                         active_tab.panes_to_hide,
                     ),
                     InputMode::Locked => locked_fullscreen_panes_to_hide(
-                        &self.mode_info.style.colors,
+                        &self.mode_info.style.theme,
                         active_tab.panes_to_hide,
                     ),
                     _ => keybinds(&self.mode_info, &self.tip_name, cols),
@@ -311,7 +311,7 @@ impl State {
                 match self.mode_info.mode {
                     InputMode::Normal => floating_panes_are_visible(&self.mode_info),
                     InputMode::Locked => {
-                        locked_floating_panes_are_visible(&self.mode_info.style.colors)
+                        locked_floating_panes_are_visible(&self.mode_info.style.theme)
                     },
                     _ => keybinds(&self.mode_info, &self.tip_name, cols),
                 }

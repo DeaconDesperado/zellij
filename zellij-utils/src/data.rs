@@ -1,5 +1,6 @@
 use crate::input::actions::Action;
 use crate::input::config::ConversionError;
+use crate::input::theme::Theme;
 use crate::shared::default_palette;
 use clap::ArgEnum;
 use serde::{Deserialize, Serialize};
@@ -737,6 +738,7 @@ pub struct StyleSpec {
     //TODO: bold ul
 }
 
+// TODO: Match the default assignments to existing colors for backward compat
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Default)]
 pub struct ThemeColorAssignments {
     pub selected_ribbon: StyleSpec,
@@ -748,7 +750,7 @@ pub struct ThemeColorAssignments {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub struct Style {
-    pub colors: ThemeColorAssignments,
+    pub theme: Theme,
     pub rounded_corners: bool,
     pub hide_session_name: bool,
 }
