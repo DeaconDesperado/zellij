@@ -1,7 +1,7 @@
 mod kdl_layout_parser;
 use crate::data::{
-    Direction, InputMode, Key, Palette, PaletteColor, PaneInfo, PaneManifest, PermissionType,
-    Resize, SessionInfo, TabInfo,
+    Direction, InputMode, Key, PaletteColor, PaneInfo, PaneManifest, PermissionType, Resize,
+    SessionInfo, StyleSpec, TabInfo,
 };
 use crate::envs::EnvironmentVariables;
 use crate::home::{find_default_config_dir, get_layout_dir};
@@ -11,7 +11,7 @@ use crate::input::layout::{Layout, PluginUserConfiguration, RunPlugin, RunPlugin
 use crate::input::options::{Clipboard, OnForceClose, Options};
 use crate::input::permission::{GrantedPermission, PermissionCache};
 use crate::input::plugins::{PluginConfig, PluginTag, PluginType, PluginsConfig};
-use crate::input::theme::{FrameConfig, Theme, Themes, UiConfig};
+use crate::input::theme::{FrameConfig, Palette, Theme, Themes, UiConfig};
 use kdl_layout_parser::KdlLayoutParser;
 use std::collections::{BTreeMap, HashMap, HashSet};
 use strum::IntoEnumIterator;
@@ -1842,21 +1842,37 @@ impl Themes {
         for theme_config in kdl_children_nodes_or_error!(themes_from_kdl, "no themes found") {
             let theme_name = kdl_name!(theme_config);
             let theme_colors = kdl_children_or_error!(theme_config, "empty theme");
+            // TODO: move these to a default
+            let palette = Palette::from([
+                ("fg", PaletteColor::try_from(("fg", theme_colors))?),
+                ("bg", PaletteColor::try_from(("bg", theme_colors))?),
+                ("red", PaletteColor::try_from(("red", theme_colors))?),
+                ("green", PaletteColor::try_from(("green", theme_colors))?),
+                ("yellow", PaletteColor::try_from(("yellow", theme_colors))?),
+                ("blue", PaletteColor::try_from(("blue", theme_colors))?),
+                (
+                    "magenta",
+                    PaletteColor::try_from(("magenta", theme_colors))?,
+                ),
+                ("orange", PaletteColor::try_from(("orange", theme_colors))?),
+                ("cyan", PaletteColor::try_from(("cyan", theme_colors))?),
+                ("black", PaletteColor::try_from(("black", theme_colors))?),
+                ("white", PaletteColor::try_from(("white", theme_colors))?),
+            ]);
+
             let theme = Theme {
-                palette: Palette {
-                    fg: PaletteColor::try_from(("fg", theme_colors))?,
-                    bg: PaletteColor::try_from(("bg", theme_colors))?,
-                    red: PaletteColor::try_from(("red", theme_colors))?,
-                    green: PaletteColor::try_from(("green", theme_colors))?,
-                    yellow: PaletteColor::try_from(("yellow", theme_colors))?,
-                    blue: PaletteColor::try_from(("blue", theme_colors))?,
-                    magenta: PaletteColor::try_from(("magenta", theme_colors))?,
-                    orange: PaletteColor::try_from(("orange", theme_colors))?,
-                    cyan: PaletteColor::try_from(("cyan", theme_colors))?,
-                    black: PaletteColor::try_from(("black", theme_colors))?,
-                    white: PaletteColor::try_from(("white", theme_colors))?,
-                    ..Default::default()
+                styling: crate::data::ThemeColorAssignments {
+                    selected_ribbon: StyleSpec {
+                        fg: palette.fg,
+                        bg: palette.bg,
+                    },
+                    unselected_ribbon: (),
+                    key: (),
+                    key_modifier: (),
+                    selected_frame: (),
                 },
+                palette: palette,
+                ..Default::default()
             };
             themes.insert(theme_name.into(), theme);
         }
