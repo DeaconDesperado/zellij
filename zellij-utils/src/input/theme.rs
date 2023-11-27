@@ -5,9 +5,13 @@ use serde::{
 use std::{
     collections::{BTreeMap, HashMap},
     fmt,
+    hash::Hash,
 };
 
-use crate::data::{PaletteColor, TermPalette, ThemeColorAssignments};
+use crate::{
+    data::{PaletteColor, ThemeColorAssignments, ThemeHue},
+    shared::colors,
+};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Deserialize, Serialize)]
 pub struct UiConfig {
@@ -37,13 +41,8 @@ impl FrameConfig {
     }
 }
 
-pub enum ThemeVariant {
-    Term(TermPalette),
-    User(Theme),
-}
-
 #[derive(Clone, PartialEq, Default)]
-pub struct Themes(HashMap<String, ThemeVariant>);
+pub struct Themes(HashMap<String, Theme>);
 
 impl fmt::Debug for Themes {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -56,7 +55,7 @@ impl fmt::Debug for Themes {
 }
 
 impl Themes {
-    pub fn from_data(theme_data: HashMap<String, ThemeVariant>) -> Self {
+    pub fn from_data(theme_data: HashMap<String, Theme>) -> Self {
         Themes(theme_data)
     }
     pub fn insert(&mut self, theme_name: String, theme: Theme) {
@@ -74,15 +73,135 @@ impl Themes {
     }
 }
 
-pub type Palette = HashMap<str, PaletteColor>;
+// TODO: move me to data
+#[derive(Default, Debug, Clone, Eq, PartialEq, Hash, Serialize, Deserialize)]
+pub struct Palette(BTreeMap<String, PaletteColor>);
 
-impl Default for Palette {
-    fn default() -> Self {
-        HashMap::from([("bg",)])
+/// Provide color defaults for backward compatiblity
+impl Palette {
+    pub fn new(colors: BTreeMap<String, PaletteColor>) -> Palette {
+        Palette(colors)
+    }
+
+    pub fn theme_hue(&self) -> ThemeHue {
+        Default::default()
+    }
+
+    pub fn fg(&self) -> PaletteColor {
+        let foreground = match self.theme_hue() {
+            ThemeHue::Dark => &PaletteColor::EightBit(colors::WHITE),
+            ThemeHue::Light => &PaletteColor::EightBit(colors::BLACK),
+        };
+
+        self.0.get("fg").unwrap_or(foreground).to_owned()
+    }
+
+    pub fn bg(&self) -> PaletteColor {
+        let foreground = match self.theme_hue() {
+            ThemeHue::Light => &PaletteColor::EightBit(colors::WHITE),
+            ThemeHue::Dark => &PaletteColor::EightBit(colors::BLACK),
+        };
+
+        self.0.get("fg").unwrap_or(foreground).to_owned()
+    }
+
+    pub fn black(&self) -> PaletteColor {
+        self.0
+            .get("black")
+            .unwrap_or(&PaletteColor::EightBit(colors::BLACK))
+            .to_owned()
+    }
+
+    pub fn red(&self) -> PaletteColor {
+        self.0
+            .get("red")
+            .unwrap_or(&PaletteColor::EightBit(colors::RED))
+            .to_owned()
+    }
+
+    pub fn green(&self) -> PaletteColor {
+        self.0
+            .get("green")
+            .unwrap_or(&PaletteColor::EightBit(colors::GREEN))
+            .to_owned()
+    }
+
+    pub fn yellow(&self) -> PaletteColor {
+        self.0
+            .get("yellow")
+            .unwrap_or(&PaletteColor::EightBit(colors::YELLOW))
+            .to_owned()
+    }
+
+    pub fn blue(&self) -> PaletteColor {
+        self.0
+            .get("blue")
+            .unwrap_or(&PaletteColor::EightBit(colors::BLUE))
+            .to_owned()
+    }
+    pub fn magenta(&self) -> PaletteColor {
+        self.0
+            .get("magenta")
+            .unwrap_or(&PaletteColor::EightBit(colors::MAGENTA))
+            .to_owned()
+    }
+    pub fn cyan(&self) -> PaletteColor {
+        self.0
+            .get("cyan")
+            .unwrap_or(&PaletteColor::EightBit(colors::CYAN))
+            .to_owned()
+    }
+    pub fn white(&self) -> PaletteColor {
+        self.0
+            .get("white")
+            .unwrap_or(&PaletteColor::EightBit(colors::WHITE))
+            .to_owned()
+    }
+    pub fn orange(&self) -> PaletteColor {
+        self.0
+            .get("orange")
+            .unwrap_or(&PaletteColor::EightBit(colors::ORANGE))
+            .to_owned()
+    }
+    pub fn gray(&self) -> PaletteColor {
+        self.0
+            .get("gray")
+            .unwrap_or(&PaletteColor::EightBit(colors::GRAY))
+            .to_owned()
+    }
+    pub fn purple(&self) -> PaletteColor {
+        self.0
+            .get("purple")
+            .unwrap_or(&PaletteColor::EightBit(colors::PURPLE))
+            .to_owned()
+    }
+    pub fn gold(&self) -> PaletteColor {
+        self.0
+            .get("gold")
+            .unwrap_or(&PaletteColor::EightBit(colors::GOLD))
+            .to_owned()
+    }
+    pub fn silver(&self) -> PaletteColor {
+        self.0
+            .get("silver")
+            .unwrap_or(&PaletteColor::EightBit(colors::SILVER))
+            .to_owned()
+    }
+    pub fn pink(&self) -> PaletteColor {
+        self.0
+            .get("pink")
+            .unwrap_or(&PaletteColor::EightBit(colors::PINK))
+            .to_owned()
+    }
+    pub fn brown(&self) -> PaletteColor {
+        self.0
+            .get("brown")
+            .unwrap_or(&PaletteColor::EightBit(colors::BROWN))
+            .to_owned()
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Default, Hash, Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Theme {
     pub palette: Palette,
     pub styling: ThemeColorAssignments,

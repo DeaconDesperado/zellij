@@ -37,7 +37,7 @@ mod not_wasm {
         ModeInfo {
             mode,
             keybinds,
-            style: attributes.style,
+            style: attributes.style.to_owned(),
             capabilities,
             session_name,
         }

@@ -4,12 +4,12 @@ use unicode_width::UnicodeWidthStr;
 use zellij_tile::prelude::*;
 use zellij_tile_utils::style;
 
-fn cursors(focused_clients: &[ClientId], palette: TermPalette) -> (Vec<ANSIString>, usize) {
+fn cursors(focused_clients: &[ClientId], palette: Palette) -> (Vec<ANSIString>, usize) {
     // cursor section, text length
     let mut len = 0;
     let mut cursors = vec![];
     for client_id in focused_clients.iter() {
-        if let Some(color) = client_id_to_colors(*client_id, palette) {
+        if let Some(color) = client_id_to_colors(*client_id, palette.clone()) {
             cursors.push(style!(color.1, color.0).paint(" "));
             len += 1;
         }
@@ -21,26 +21,26 @@ pub fn render_tab(
     text: String,
     tab: &TabInfo,
     is_alternate_tab: bool,
-    palette: TermPalette,
+    palette: Palette,
     separator: &str,
 ) -> LinePart {
     let focused_clients = tab.other_focused_clients.as_slice();
     let separator_width = separator.width();
-    let alternate_tab_color = match palette.theme_hue {
+    let alternate_tab_color = match palette.theme_hue() {
         // TODO: only do this if we don't have the arrow capabilities
-        ThemeHue::Dark => palette.white,
-        ThemeHue::Light => palette.black,
+        ThemeHue::Dark => palette.white(),
+        ThemeHue::Light => palette.black(),
     };
     let background_color = if tab.active {
-        palette.green
+        palette.green()
     } else if is_alternate_tab {
         alternate_tab_color
     } else {
-        palette.fg
+        palette.fg()
     };
-    let foreground_color = match palette.theme_hue {
-        ThemeHue::Dark => palette.black,
-        ThemeHue::Light => palette.white,
+    let foreground_color = match palette.theme_hue() {
+        ThemeHue::Dark => palette.black(),
+        ThemeHue::Light => palette.white(),
     };
     let left_separator = style!(foreground_color, background_color).paint(separator);
     let mut tab_text_len = text.width() + (separator_width * 2) + 2; // + 2 for padding
@@ -85,7 +85,7 @@ pub fn tab_style(
     mut tabname: String,
     tab: &TabInfo,
     mut is_alternate_tab: bool,
-    palette: TermPalette,
+    palette: Palette,
     capabilities: PluginCapabilities,
 ) -> LinePart {
     let separator = tab_separator(capabilities);

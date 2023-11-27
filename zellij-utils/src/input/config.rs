@@ -1,4 +1,3 @@
-use crate::data::{TermPalette, ThemeColorAssignments};
 use miette::{Diagnostic, LabeledSpan, NamedSource, SourceCode};
 use std::fs::File;
 use std::io::{self, Read};
@@ -160,10 +159,10 @@ impl TryFrom<&CliArgs> for Config {
 }
 
 impl Config {
-    pub fn theme_config(&self, opts: &Options) -> Option {
+    pub fn theme_config(&self, opts: &Options) -> Option<Theme> {
         match &opts.theme {
-            Some(theme_name) => self.themes.get_theme(theme_name).map(|theme| theme.palette),
-            None => self.themes.get_theme("default").map(|theme| theme.palette),
+            Some(theme_name) => self.themes.get_theme(theme_name).cloned(),
+            None => self.themes.get_theme("default").cloned(),
         }
     }
 
@@ -228,7 +227,7 @@ impl Config {
 #[cfg(test)]
 mod config_test {
     use super::*;
-    use crate::data::{InputMode, PaletteColor, PluginTag, TermPalette};
+    use crate::data::{InputMode, PluginTag, ThemeColorAssignments};
     use crate::input::layout::RunPluginLocation;
     use crate::input::options::{Clipboard, OnForceClose};
     use crate::input::plugins::{PluginConfig, PluginType, PluginsConfig};
@@ -439,20 +438,8 @@ mod config_test {
         expected_themes.insert(
             "dracula".into(),
             Theme {
-                palette: TermPalette {
-                    fg: PaletteColor::Rgb((248, 248, 242)),
-                    bg: PaletteColor::Rgb((40, 42, 54)),
-                    red: PaletteColor::Rgb((255, 85, 85)),
-                    green: PaletteColor::Rgb((80, 250, 123)),
-                    yellow: PaletteColor::Rgb((241, 250, 140)),
-                    blue: PaletteColor::Rgb((98, 114, 164)),
-                    magenta: PaletteColor::Rgb((255, 121, 198)),
-                    orange: PaletteColor::Rgb((255, 184, 108)),
-                    cyan: PaletteColor::Rgb((139, 233, 253)),
-                    black: PaletteColor::Rgb((0, 0, 0)),
-                    white: PaletteColor::Rgb((255, 255, 255)),
-                    ..Default::default()
-                },
+                palette: Default::default(),
+                styling: ThemeColorAssignments::default(),
             },
         );
         let expected_themes = Themes::from_data(expected_themes);
@@ -496,39 +483,15 @@ mod config_test {
         expected_themes.insert(
             "dracula".into(),
             Theme {
-                palette: TermPalette {
-                    fg: PaletteColor::Rgb((248, 248, 242)),
-                    bg: PaletteColor::Rgb((40, 42, 54)),
-                    red: PaletteColor::Rgb((255, 85, 85)),
-                    green: PaletteColor::Rgb((80, 250, 123)),
-                    yellow: PaletteColor::Rgb((241, 250, 140)),
-                    blue: PaletteColor::Rgb((98, 114, 164)),
-                    magenta: PaletteColor::Rgb((255, 121, 198)),
-                    orange: PaletteColor::Rgb((255, 184, 108)),
-                    cyan: PaletteColor::Rgb((139, 233, 253)),
-                    black: PaletteColor::Rgb((0, 0, 0)),
-                    white: PaletteColor::Rgb((255, 255, 255)),
-                    ..Default::default()
-                },
+                palette: Default::default(),
+                styling: ThemeColorAssignments::default(),
             },
         );
         expected_themes.insert(
             "nord".into(),
             Theme {
-                palette: TermPalette {
-                    fg: PaletteColor::Rgb((216, 222, 233)),
-                    bg: PaletteColor::Rgb((46, 52, 64)),
-                    black: PaletteColor::Rgb((59, 66, 82)),
-                    red: PaletteColor::Rgb((191, 97, 106)),
-                    green: PaletteColor::Rgb((163, 190, 140)),
-                    yellow: PaletteColor::Rgb((235, 203, 139)),
-                    blue: PaletteColor::Rgb((129, 161, 193)),
-                    magenta: PaletteColor::Rgb((180, 142, 173)),
-                    cyan: PaletteColor::Rgb((136, 192, 208)),
-                    white: PaletteColor::Rgb((229, 233, 240)),
-                    orange: PaletteColor::Rgb((208, 135, 112)),
-                    ..Default::default()
-                },
+                palette: Default::default(),
+                styling: ThemeColorAssignments::default(),
             },
         );
         let expected_themes = Themes::from_data(expected_themes);
@@ -559,20 +522,8 @@ mod config_test {
         expected_themes.insert(
             "eight_bit_theme".into(),
             Theme {
-                palette: TermPalette {
-                    fg: PaletteColor::EightBit(248),
-                    bg: PaletteColor::EightBit(40),
-                    red: PaletteColor::EightBit(255),
-                    green: PaletteColor::EightBit(80),
-                    yellow: PaletteColor::EightBit(241),
-                    blue: PaletteColor::EightBit(98),
-                    magenta: PaletteColor::EightBit(255),
-                    orange: PaletteColor::EightBit(255),
-                    cyan: PaletteColor::EightBit(139),
-                    black: PaletteColor::EightBit(1),
-                    white: PaletteColor::EightBit(255),
-                    ..Default::default()
-                },
+                palette: Default::default(),
+                styling: ThemeColorAssignments::default(),
             },
         );
         let expected_themes = Themes::from_data(expected_themes);
