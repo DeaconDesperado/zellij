@@ -12,11 +12,8 @@ impl TryFrom<ProtobufStyle> for Style {
     type Error = &'static str;
     fn try_from(protobuf_style: ProtobufStyle) -> Result<Self, &'static str> {
         Ok(Style {
-            theme: protobuf_style
-                .palette
-                .ok_or("malformed style payload")?
-                .try_into()?,
-            theme_colors: Default::default(),
+            // TODO: default
+            theme: Default::default(),
             rounded_corners: protobuf_style.rounded_corners,
             hide_session_name: protobuf_style.hide_session_name,
         })
@@ -27,7 +24,7 @@ impl TryFrom<Style> for ProtobufStyle {
     type Error = &'static str;
     fn try_from(style: Style) -> Result<Self, &'static str> {
         Ok(ProtobufStyle {
-            palette: Some(style.theme.try_into()?),
+            palette: todo!(),
             rounded_corners: style.rounded_corners,
             hide_session_name: style.hide_session_name,
         })

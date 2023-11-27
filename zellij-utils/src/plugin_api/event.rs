@@ -13,9 +13,12 @@ pub use super::generated_api::api::{
     key::Key as ProtobufKey,
     style::Style as ProtobufStyle,
 };
-use crate::data::{
-    CopyDestination, Event, EventType, InputMode, Key, ModeInfo, Mouse, PaneInfo, PaneManifest,
-    PermissionStatus, PluginCapabilities, SessionInfo, Style, TabInfo,
+use crate::{
+    data::{
+        CopyDestination, Event, EventType, InputMode, Key, ModeInfo, Mouse, PaneInfo, PaneManifest,
+        PermissionStatus, PluginCapabilities, SessionInfo, Style, TabInfo,
+    },
+    input::theme::Theme,
 };
 
 use crate::errors::prelude::*;
@@ -938,7 +941,7 @@ fn serialize_mode_update_event() {
 
 #[test]
 fn serialize_mode_update_event_with_non_default_values() {
-    use crate::data::{Direction, PaletteColor, TermPalette, ThemeHue};
+    use crate::data::Direction;
     use prost::Message;
     let mode_update_event = Event::ModeUpdate(ModeInfo {
         mode: InputMode::Locked,
@@ -972,26 +975,10 @@ fn serialize_mode_update_event_with_non_default_values() {
             ),
         ],
         style: Style {
-            theme: TermPalette {
-                source: crate::data::PaletteSource::Default,
-                theme_hue: ThemeHue::Light,
-                fg: PaletteColor::Rgb((1, 1, 1)),
-                bg: PaletteColor::Rgb((200, 200, 200)),
-                black: PaletteColor::EightBit(1),
-                red: PaletteColor::EightBit(2),
-                green: PaletteColor::EightBit(2),
-                yellow: PaletteColor::EightBit(2),
-                blue: PaletteColor::EightBit(2),
-                magenta: PaletteColor::EightBit(2),
-                cyan: PaletteColor::EightBit(2),
-                white: PaletteColor::EightBit(2),
-                orange: PaletteColor::EightBit(2),
-                gray: PaletteColor::EightBit(2),
-                purple: PaletteColor::EightBit(2),
-                gold: PaletteColor::EightBit(2),
-                silver: PaletteColor::EightBit(2),
-                pink: PaletteColor::EightBit(2),
-                brown: PaletteColor::Rgb((222, 221, 220)),
+            theme: Theme {
+                //TODO: defaults
+                palette: Default::default(),
+                styling: Default::default(),
             },
             rounded_corners: true,
             hide_session_name: false,

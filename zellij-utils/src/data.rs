@@ -1,5 +1,6 @@
 use crate::input::actions::Action;
 use crate::input::config::ConversionError;
+use crate::input::theme::Palette;
 use crate::input::theme::Theme;
 use crate::shared::default_palette;
 use clap::ArgEnum;
@@ -15,26 +16,26 @@ pub type ClientId = u16; // TODO: merge with crate type?
 
 pub fn client_id_to_colors(
     client_id: ClientId,
-    colors: TermPalette,
+    colors: Palette,
 ) -> Option<(PaletteColor, PaletteColor)> {
     // (primary color, secondary color)
     match client_id {
-        1 => Some((colors.magenta, colors.black)),
-        2 => Some((colors.blue, colors.black)),
-        3 => Some((colors.purple, colors.black)),
-        4 => Some((colors.yellow, colors.black)),
-        5 => Some((colors.cyan, colors.black)),
-        6 => Some((colors.gold, colors.black)),
-        7 => Some((colors.red, colors.black)),
-        8 => Some((colors.silver, colors.black)),
-        9 => Some((colors.pink, colors.black)),
-        10 => Some((colors.brown, colors.black)),
+        1 => Some((colors.magenta(), colors.black())),
+        2 => Some((colors.blue(), colors.black())),
+        3 => Some((colors.purple(), colors.black())),
+        4 => Some((colors.yellow(), colors.black())),
+        5 => Some((colors.cyan(), colors.black())),
+        6 => Some((colors.gold(), colors.black())),
+        7 => Some((colors.red(), colors.black())),
+        8 => Some((colors.silver(), colors.black())),
+        9 => Some((colors.pink(), colors.black())),
+        10 => Some((colors.brown(), colors.black())),
         _ => None,
     }
 }
 
-pub fn single_client_color(colors: TermPalette) -> (PaletteColor, PaletteColor) {
-    (colors.green, colors.black)
+pub fn single_client_color(colors: Palette) -> (PaletteColor, PaletteColor) {
+    (colors.green(), colors.black())
 }
 
 // TODO: Add a shortened string representation (beyond `Display::fmt` below) that can be used when
@@ -739,7 +740,7 @@ pub struct StyleSpec {
 }
 
 // TODO: Match the default assignments to existing colors for backward compat
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Default)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct ThemeColorAssignments {
     pub selected_ribbon: StyleSpec,
     pub unselected_ribbon: StyleSpec,
@@ -748,7 +749,19 @@ pub struct ThemeColorAssignments {
     pub selected_frame: StyleSpec,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+impl Default for ThemeColorAssignments {
+    fn default() -> Self {
+        Self {
+            selected_ribbon: Default::default(),
+            unselected_ribbon: Default::default(),
+            key: Default::default(),
+            key_modifier: Default::default(),
+            selected_frame: Default::default(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub struct Style {
     pub theme: Theme,
     pub rounded_corners: bool,
