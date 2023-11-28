@@ -1868,7 +1868,7 @@ impl Themes {
                     key_modifier: fixture_spec,
                     selected_frame: fixture_spec,
                 },
-                palette: palette,
+                palette,
                 ..Default::default()
             };
             themes.insert(theme_name.into(), theme);
