@@ -173,7 +173,7 @@ fn right_more_message(
 fn tab_line_prefix(
     session_name: Option<&str>,
     mode: InputMode,
-    palette: Palette,
+    palette: &Palette,
     cols: usize,
 ) -> Vec<LinePart> {
     let prefix_text = " Zellij ".to_string();
@@ -268,8 +268,8 @@ pub fn tab_line(
         tabs_before_active.pop().unwrap()
     };
     let mut prefix = match hide_session_name {
-        true => tab_line_prefix(None, mode, palette, cols),
-        false => tab_line_prefix(session_name, mode, palette, cols),
+        true => tab_line_prefix(None, mode, &palette, cols),
+        false => tab_line_prefix(session_name, mode, &palette, cols),
     };
     let prefix_len = get_current_title_len(&prefix);
 
@@ -285,7 +285,7 @@ pub fn tab_line(
         &mut tabs_after_active,
         &mut tabs_to_render,
         cols.saturating_sub(prefix_len),
-        palette,
+        &palette,
         capabilities,
     );
     prefix.append(&mut tabs_to_render);
