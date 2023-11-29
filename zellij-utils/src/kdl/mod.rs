@@ -1886,12 +1886,6 @@ impl Themes {
         let mut themes: HashMap<String, Theme> = HashMap::new();
         for theme_config in kdl_children_nodes_or_error!(themes_from_kdl, "no themes found") {
             let theme_name = kdl_name!(theme_config);
-            let palette_node =
-                kdl_child_with_name!(theme_config, "palette").ok_or(ConfigError::new_kdl_error(
-                    "Palette invalid".into(),
-                    theme_config.span().offset(),
-                    theme_config.span().len(),
-                ))?;
 
             let styling_node =
                 kdl_child_with_name!(theme_config, "styling").ok_or(ConfigError::new_kdl_error(
@@ -1901,8 +1895,8 @@ impl Themes {
                 ))?;
 
             let mut colors = BTreeMap::new();
-            let foo = kdl_children_nodes_or_error!(palette_node, "Palette is empty");
-            for color in foo {
+            let color_nodes = kdl_children_nodes_or_error!(theme_config, "Palette is empty").iter();
+            for color in color_nodes.filter(|n| n.name().value() != "styling") {
                 let color_name = kdl_name!(color);
                 let color = PaletteColor::try_from(color)?;
                 colors.insert(color_name.to_owned(), color);
