@@ -1,7 +1,7 @@
 mod kdl_layout_parser;
 use crate::data::{
     Direction, InputMode, Key, PaletteColor, PaneInfo, PaneManifest, PermissionType, Resize,
-    SessionInfo, StyleSpec, TabInfo,
+    SessionInfo, StyleSpec, TabInfo, ThemeColorAssignments,
 };
 use crate::envs::EnvironmentVariables;
 use crate::home::{find_default_config_dir, get_layout_dir};
@@ -1399,6 +1399,60 @@ macro_rules! kdl_get_int_entry {
     };
 }
 
+impl TryFrom<(&KdlNode, &Palette)> for ThemeColorAssignments {
+    type Error = ConfigError;
+
+    fn try_from((node, palette): (&KdlNode, &Palette)) -> Result<Self, Self::Error> {
+        Ok(ThemeColorAssignments {
+            selected_ribbon: StyleSpec::try_from((node, "selected_ribbon", palette))?,
+            unselected_ribbon: StyleSpec::try_from((node, "unselected_ribbon", palette))?,
+            key: StyleSpec::try_from((node, "key", palette))?,
+            key_modifier: StyleSpec::try_from((node, "key_modifier", palette))?,
+            selected_frame: StyleSpec::try_from((node, "selected_frame", palette))?,
+        })
+    }
+}
+
+#[macro_export]
+macro_rules! kdl_get_color_by_name_from_palette {
+    ( $kdl_node:expr, $child_name:expr , $palette:expr) => {
+        $kdl_node
+            .children()
+            .and_then(|c| c.get($child_name))
+            .and_then(|c| c.get(0))
+            .and_then(|c| c.value().as_string())
+            .ok_or(ConfigError::new_kdl_error(
+                format!("Invalid style for {}", $child_name),
+                $kdl_node.span().offset(),
+                $kdl_node.span().len(),
+            ))
+            .and_then(|c| {
+                $palette.get(c).ok_or(ConfigError::new_kdl_error(
+                    format!("No color in palette {}", c),
+                    $kdl_node.span().offset(),
+                    $kdl_node.span().len(),
+                ))
+            })
+    };
+}
+
+impl TryFrom<(&KdlNode, &str, &Palette)> for StyleSpec {
+    type Error = ConfigError;
+
+    fn try_from((node, name, palette): (&KdlNode, &str, &Palette)) -> Result<Self, Self::Error> {
+        let spec_node = kdl_get_child!(node, name).ok_or(ConfigError::new_kdl_error(
+            format!("Missing styling for {}", name),
+            node.span().offset(),
+            node.span().len(),
+        ))?;
+
+        Ok(StyleSpec {
+            fg: kdl_get_color_by_name_from_palette!(spec_node, "fg", palette)?,
+            bg: kdl_get_color_by_name_from_palette!(spec_node, "bg", palette)?,
+        })
+    }
+}
+
 impl Options {
     pub fn from_kdl(kdl_options: &KdlDocument) -> Result<Self, ConfigError> {
         let on_force_close =
@@ -1855,19 +1909,10 @@ impl Themes {
             }
 
             let palette = Palette::new(colors);
-            let fixture_spec = StyleSpec {
-                fg: palette.black(),
-                bg: palette.orange(),
-            };
-
+            let styling =
+                ThemeColorAssignments::try_from((styling_node, &palette)).unwrap_or_default();
             let theme = Theme {
-                styling: crate::data::ThemeColorAssignments {
-                    selected_ribbon: fixture_spec,
-                    unselected_ribbon: fixture_spec,
-                    key: fixture_spec,
-                    key_modifier: fixture_spec,
-                    selected_frame: fixture_spec,
-                },
+                styling,
                 palette,
                 ..Default::default()
             };
