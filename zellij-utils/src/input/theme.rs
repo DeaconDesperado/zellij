@@ -83,6 +83,10 @@ impl Palette {
         Palette(colors)
     }
 
+    pub fn get(&self, key: &str) -> Option<PaletteColor> {
+        self.0.get(key).copied()
+    }
+
     pub fn theme_hue(&self) -> ThemeHue {
         Default::default()
     }

@@ -433,11 +433,27 @@ mod config_test {
                         white 255 255 255
                     }
                     styling {
-                        selected_ribbon "black"
-                        unselected_ribbon "black"
-                        key "black"
-                        key_modifier "black"
-                        selected_frame "black"
+                        selected_ribbon {
+                            fg "cyan"
+                            bg "cyan"
+                        }
+                        unselected_ribbon {
+                            fg "cyan"
+                            bg "cyan"
+                        }
+                        key {
+                            fg "cyan"
+                            bg "cyan"
+                        }
+                        key_modifier {
+                            fg "cyan"
+                            bg "cyan"
+                        }
+                        selected_frame {
+                            fg "cyan"
+                            bg "cyan"
+                        }
+
                     }
                 }
             }
