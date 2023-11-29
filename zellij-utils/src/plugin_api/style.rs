@@ -1,7 +1,7 @@
 use super::generated_api::api::style::{
     color::Payload as ProtobufColorPayload, Color as ProtobufColor, ColorType as ProtobufColorType,
     Palette as ProtobufPalette, RgbColorPayload as ProtobufRgbColorPayload, Style as ProtobufStyle,
-    ThemeHue as ProtobufThemeHue,
+    ThemeColorAssignments as ProtobufThemeColorAssignments, ThemeHue as ProtobufThemeHue,
 };
 use crate::data::{PaletteColor, Style, TermPalette, ThemeHue};
 use crate::errors::prelude::*;
@@ -24,9 +24,11 @@ impl TryFrom<Style> for ProtobufStyle {
     type Error = &'static str;
     fn try_from(style: Style) -> Result<Self, &'static str> {
         Ok(ProtobufStyle {
-            palette: todo!(),
+            //TODO: Nones
+            palette: None,
             rounded_corners: style.rounded_corners,
             hide_session_name: style.hide_session_name,
+            theme_colors: None,
         })
     }
 }

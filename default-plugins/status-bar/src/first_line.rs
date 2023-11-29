@@ -456,7 +456,7 @@ pub fn first_line(
     separator: &str,
 ) -> LinePart {
     let supports_arrow_fonts = !help.capabilities.arrow_fonts;
-    let colored_elements = color_elements(help.style.theme, !supports_arrow_fonts);
+    let colored_elements = color_elements(TermPalette::default(), !supports_arrow_fonts);
     let binds = &help.get_mode_keybinds();
     // Unselect all by default
     let mut default_keys = vec![
@@ -546,7 +546,7 @@ pub fn first_line(
                 tab_info.is_swap_layout_dirty,
                 help,
                 colored_elements,
-                &help.style.theme,
+                &TermPalette::default(),
                 separator,
             ) {
                 remaining_space -= swap_layout_status.len;

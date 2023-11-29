@@ -61,9 +61,9 @@ fn locked_interface_indication(palette: TermPalette) -> LinePart {
 
 fn add_shortcut(help: &ModeInfo, linepart: &LinePart, text: &str, keys: Vec<Key>) -> LinePart {
     let shortcut = if linepart.len == 0 {
-        full_length_shortcut(true, keys, text, help.style.theme)
+        full_length_shortcut(true, keys, text, TermPalette::default())
     } else {
-        full_length_shortcut(false, keys, text, help.style.theme)
+        full_length_shortcut(false, keys, text, TermPalette::default())
     };
 
     let mut new_linepart = LinePart::default();
@@ -289,7 +289,7 @@ fn shortened_shortcut_list_nonstandard_mode(help: &ModeInfo) -> LinePart {
 fn shortened_shortcut_list(help: &ModeInfo, tip: TipFn) -> LinePart {
     match help.mode {
         InputMode::Normal => tip(help),
-        InputMode::Locked => locked_interface_indication(help.style.theme),
+        InputMode::Locked => locked_interface_indication(TermPalette::default()),
         _ => shortened_shortcut_list_nonstandard_mode(help),
     }
 }
@@ -321,7 +321,7 @@ fn best_effort_shortcut_list(help: &ModeInfo, tip: TipFn, max_len: usize) -> Lin
             }
         },
         InputMode::Locked => {
-            let line_part = locked_interface_indication(help.style.theme);
+            let line_part = locked_interface_indication(TermPalette::default());
             if line_part.len <= max_len {
                 line_part
             } else {
@@ -407,7 +407,7 @@ pub fn fullscreen_panes_to_hide(palette: &TermPalette, panes_to_hide: usize) -> 
 }
 
 pub fn floating_panes_are_visible(mode_info: &ModeInfo) -> LinePart {
-    let palette = mode_info.style.theme;
+    let palette = TermPalette::default();
     let km = &mode_info.get_mode_keybinds();
     let white_color = match palette.white {
         PaletteColor::Rgb((r, g, b)) => RGB(r, g, b),

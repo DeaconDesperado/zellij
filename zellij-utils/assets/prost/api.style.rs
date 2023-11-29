@@ -7,6 +7,30 @@ pub struct Style {
     pub rounded_corners: bool,
     #[prost(bool, tag = "3")]
     pub hide_session_name: bool,
+    #[prost(message, optional, tag = "4")]
+    pub theme_colors: ::core::option::Option<ThemeColorAssignments>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ThemeColorAssignments {
+    #[prost(message, optional, tag = "1")]
+    pub selected_ribbon: ::core::option::Option<StyleSpec>,
+    #[prost(message, optional, tag = "2")]
+    pub unselected_ribbon: ::core::option::Option<StyleSpec>,
+    #[prost(message, optional, tag = "3")]
+    pub key: ::core::option::Option<StyleSpec>,
+    #[prost(message, optional, tag = "4")]
+    pub key_modifier: ::core::option::Option<StyleSpec>,
+    #[prost(message, optional, tag = "5")]
+    pub selected_frame: ::core::option::Option<StyleSpec>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct StyleSpec {
+    #[prost(message, optional, tag = "1")]
+    pub fg: ::core::option::Option<Color>,
+    #[prost(message, optional, tag = "2")]
+    pub bg: ::core::option::Option<Color>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

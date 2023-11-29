@@ -6,6 +6,20 @@ message Style {
   Palette palette = 1;
   bool rounded_corners = 2;
   bool hide_session_name = 3;
+  ThemeColorAssignments theme_colors = 4;
+}
+
+message ThemeColorAssignments {
+  StyleSpec selected_ribbon = 1;
+  StyleSpec unselected_ribbon = 2;
+  StyleSpec key = 3;
+  StyleSpec key_modifier = 4;
+  StyleSpec selected_frame = 5;
+}
+
+message StyleSpec {
+  Color fg = 1;
+  Color bg = 2;
 }
 
 message Palette {
