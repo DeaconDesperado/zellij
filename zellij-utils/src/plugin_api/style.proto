@@ -15,6 +15,8 @@ message ThemeColorAssignments {
   StyleSpec key = 3;
   StyleSpec key_modifier = 4;
   StyleSpec selected_frame = 5;
+  StyleSpec text = 6;
+  StyleSpec error_text = 7;
 }
 
 message StyleSpec {

@@ -70,8 +70,8 @@ fn add_keybinds(help: &ModeInfo) -> Vec<ANSIString> {
             letters.push(key);
         }
     }
-    let arrows = style_key_with_modifier(&arrows, &help.style.theme, None);
-    let letters = style_key_with_modifier(&letters, &help.style.theme, None);
+    let arrows = style_key_with_modifier(&arrows, &help.style.theme.styling, None);
+    let letters = style_key_with_modifier(&letters, &help.style.theme.styling, None);
     if arrows.is_empty() && letters.is_empty() {
         vec![Style::new().bold().paint("UNBOUND")]
     } else if arrows.is_empty() || letters.is_empty() {

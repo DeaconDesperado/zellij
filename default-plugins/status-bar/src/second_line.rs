@@ -17,17 +17,13 @@ fn full_length_shortcut(
     is_first_shortcut: bool,
     key: Vec<Key>,
     action: &str,
-    palette: TermPalette,
+    palette: ThemeColorAssignments,
 ) -> LinePart {
     if key.is_empty() {
         return LinePart::default();
     }
 
-    let text_color = palette_match!(match palette.theme_hue {
-        ThemeHue::Dark => palette.white,
-        ThemeHue::Light => palette.black,
-    });
-
+    let text_color = palette_match!(palette.text.fg);
     let separator = if is_first_shortcut { " " } else { " / " };
     let mut bits: Vec<ANSIString> = vec![Style::new().fg(text_color).paint(separator)];
     bits.extend(style_key_with_modifier(&key, &palette, None));
@@ -45,13 +41,10 @@ fn full_length_shortcut(
     }
 }
 
-fn locked_interface_indication(palette: TermPalette) -> LinePart {
+fn locked_interface_indication(palette: ThemeColorAssignments) -> LinePart {
     let locked_text = " -- INTERFACE LOCKED -- ";
     let locked_text_len = locked_text.chars().count();
-    let text_color = palette_match!(match palette.theme_hue {
-        ThemeHue::Dark => palette.white,
-        ThemeHue::Light => palette.black,
-    });
+    let text_color = palette_match!(palette.text.fg);
     let locked_styled_text = Style::new().fg(text_color).bold().paint(locked_text);
     LinePart {
         part: locked_styled_text.to_string(),
@@ -61,9 +54,9 @@ fn locked_interface_indication(palette: TermPalette) -> LinePart {
 
 fn add_shortcut(help: &ModeInfo, linepart: &LinePart, text: &str, keys: Vec<Key>) -> LinePart {
     let shortcut = if linepart.len == 0 {
-        full_length_shortcut(true, keys, text, TermPalette::default())
+        full_length_shortcut(true, keys, text, ThemeColorAssignments::default())
     } else {
-        full_length_shortcut(false, keys, text, TermPalette::default())
+        full_length_shortcut(false, keys, text, ThemeColorAssignments::default())
     };
 
     let mut new_linepart = LinePart::default();
@@ -271,7 +264,7 @@ fn get_keys_and_hints(mi: &ModeInfo) -> Vec<(String, String, Vec<Key>)> {
 fn full_shortcut_list(help: &ModeInfo, tip: TipFn) -> LinePart {
     match help.mode {
         InputMode::Normal => tip(help),
-        InputMode::Locked => locked_interface_indication(help.style.theme),
+        InputMode::Locked => locked_interface_indication(help.style.theme.styling),
         _ => full_shortcut_list_nonstandard_mode(help),
     }
 }
@@ -289,7 +282,7 @@ fn shortened_shortcut_list_nonstandard_mode(help: &ModeInfo) -> LinePart {
 fn shortened_shortcut_list(help: &ModeInfo, tip: TipFn) -> LinePart {
     match help.mode {
         InputMode::Normal => tip(help),
-        InputMode::Locked => locked_interface_indication(TermPalette::default()),
+        InputMode::Locked => locked_interface_indication(ThemeColorAssignments::default()),
         _ => shortened_shortcut_list_nonstandard_mode(help),
     }
 }
@@ -321,7 +314,7 @@ fn best_effort_shortcut_list(help: &ModeInfo, tip: TipFn, max_len: usize) -> Lin
             }
         },
         InputMode::Locked => {
-            let line_part = locked_interface_indication(TermPalette::default());
+            let line_part = locked_interface_indication(ThemeColorAssignments::default());
             if line_part.len <= max_len {
                 line_part
             } else {
@@ -349,8 +342,11 @@ pub fn keybinds(help: &ModeInfo, tip_name: &str, max_width: usize) -> LinePart {
     best_effort_shortcut_list(help, tip_body.short, max_width)
 }
 
-pub fn text_copied_hint(palette: &TermPalette, copy_destination: CopyDestination) -> LinePart {
-    let green_color = palette_match!(palette.green);
+pub fn text_copied_hint(
+    palette: &ThemeColorAssignments,
+    copy_destination: CopyDestination,
+) -> LinePart {
+    let green_color = palette_match!(palette.text.fg);
     let hint = match copy_destination {
         CopyDestination::Command => "Text piped to external command",
         #[cfg(not(target_os = "macos"))]
@@ -365,22 +361,19 @@ pub fn text_copied_hint(palette: &TermPalette, copy_destination: CopyDestination
     }
 }
 
-pub fn system_clipboard_error(palette: &TermPalette) -> LinePart {
+pub fn system_clipboard_error(palette: &ThemeColorAssignments) -> LinePart {
     let hint = " Error using the system clipboard.";
-    let red_color = palette_match!(palette.red);
+    let red_color = palette_match!(palette.error_text.fg);
     LinePart {
         part: Style::new().fg(red_color).bold().paint(hint).to_string(),
         len: hint.len(),
     }
 }
 
-pub fn fullscreen_panes_to_hide(palette: &TermPalette, panes_to_hide: usize) -> LinePart {
-    let text_color = palette_match!(match palette.theme_hue {
-        ThemeHue::Dark => palette.white,
-        ThemeHue::Light => palette.black,
-    });
-    let green_color = palette_match!(palette.green);
-    let orange_color = palette_match!(palette.orange);
+pub fn fullscreen_panes_to_hide(palette: &ThemeColorAssignments, panes_to_hide: usize) -> LinePart {
+    let text_color = palette_match!(palette.text.fg);
+    let green_color = palette_match!(palette.text.fg);
+    let orange_color = palette_match!(palette.text.fg);
     let shortcut_left_separator = Style::new().fg(text_color).bold().paint(" (");
     let shortcut_right_separator = Style::new().fg(text_color).bold().paint("): ");
     let fullscreen = "FULLSCREEN";
@@ -407,20 +400,11 @@ pub fn fullscreen_panes_to_hide(palette: &TermPalette, panes_to_hide: usize) -> 
 }
 
 pub fn floating_panes_are_visible(mode_info: &ModeInfo) -> LinePart {
-    let palette = TermPalette::default();
+    let palette = ThemeColorAssignments::default();
     let km = &mode_info.get_mode_keybinds();
-    let white_color = match palette.white {
-        PaletteColor::Rgb((r, g, b)) => RGB(r, g, b),
-        PaletteColor::EightBit(color) => Fixed(color),
-    };
-    let green_color = match palette.green {
-        PaletteColor::Rgb((r, g, b)) => RGB(r, g, b),
-        PaletteColor::EightBit(color) => Fixed(color),
-    };
-    let orange_color = match palette.orange {
-        PaletteColor::Rgb((r, g, b)) => RGB(r, g, b),
-        PaletteColor::EightBit(color) => Fixed(color),
-    };
+    let white_color = palette_match!(mode_info.style.theme.styling.text.fg);
+    let green_color = palette_match!(mode_info.style.theme.styling.text.fg);
+    let orange_color = palette_match!(mode_info.style.theme.styling.text.fg);
     let shortcut_left_separator = Style::new().fg(white_color).bold().paint(" (");
     let shortcut_right_separator = Style::new().fg(white_color).bold().paint("): ");
     let floating_panes = "FLOATING PANES VISIBLE";
@@ -472,13 +456,13 @@ pub fn floating_panes_are_visible(mode_info: &ModeInfo) -> LinePart {
     }
 }
 
-pub fn locked_fullscreen_panes_to_hide(palette: &TermPalette, panes_to_hide: usize) -> LinePart {
-    let text_color = palette_match!(match palette.theme_hue {
-        ThemeHue::Dark => palette.white,
-        ThemeHue::Light => palette.black,
-    });
-    let green_color = palette_match!(palette.green);
-    let orange_color = palette_match!(palette.orange);
+pub fn locked_fullscreen_panes_to_hide(
+    palette: &ThemeColorAssignments,
+    panes_to_hide: usize,
+) -> LinePart {
+    let text_color = palette_match!(palette.text.fg);
+    let green_color = palette_match!(palette.text.fg);
+    let orange_color = palette_match!(palette.text.fg);
     let locked_text = " -- INTERFACE LOCKED -- ";
     let shortcut_left_separator = Style::new().fg(text_color).bold().paint(" (");
     let shortcut_right_separator = Style::new().fg(text_color).bold().paint("): ");
@@ -507,15 +491,9 @@ pub fn locked_fullscreen_panes_to_hide(palette: &TermPalette, panes_to_hide: usi
     }
 }
 
-pub fn locked_floating_panes_are_visible(palette: &TermPalette) -> LinePart {
-    let white_color = match palette.white {
-        PaletteColor::Rgb((r, g, b)) => RGB(r, g, b),
-        PaletteColor::EightBit(color) => Fixed(color),
-    };
-    let orange_color = match palette.orange {
-        PaletteColor::Rgb((r, g, b)) => RGB(r, g, b),
-        PaletteColor::EightBit(color) => Fixed(color),
-    };
+pub fn locked_floating_panes_are_visible(palette: &ThemeColorAssignments) -> LinePart {
+    let white_color = palette_match!(palette.text.fg);
+    let orange_color = palette_match!(palette.text.fg);
     let shortcut_left_separator = Style::new().fg(white_color).bold().paint(" (");
     let shortcut_right_separator = Style::new().fg(white_color).bold().paint(")");
     let locked_text = " -- INTERFACE LOCKED -- ";
@@ -554,8 +532,8 @@ mod tests {
         string.to_string()
     }
 
-    fn get_palette() -> TermPalette {
-        TermPalette::default()
+    fn get_palette() -> ThemeColorAssignments {
+        ThemeColorAssignments::default()
     }
 
     #[test]

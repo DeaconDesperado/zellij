@@ -234,14 +234,14 @@ fn key_indicators(
     line_part
 }
 
-fn swap_layout_keycode(mode_info: &ModeInfo, palette: &TermPalette) -> LinePart {
+fn swap_layout_keycode(mode_info: &ModeInfo, palette: &ThemeColorAssignments) -> LinePart {
     let mode_keybinds = mode_info.get_mode_keybinds();
     let prev_next_keys = action_key_group(
         &mode_keybinds,
         &[&[Action::PreviousSwapLayout], &[Action::NextSwapLayout]],
     );
     let prev_next_keys_indicator =
-        style_key_with_modifier(&prev_next_keys, palette, Some(palette.black));
+        style_key_with_modifier(&prev_next_keys, palette, Some(palette.text.bg));
     let keycode = ANSIStrings(&prev_next_keys_indicator);
     let len = unstyled_len(&keycode);
     let part = keycode.to_string();
@@ -254,7 +254,7 @@ fn swap_layout_status(
     is_swap_layout_damaged: bool,
     mode_info: &ModeInfo,
     colored_elements: ColoredElements,
-    palette: &TermPalette,
+    palette: &ThemeColorAssignments,
     separator: &str,
 ) -> Option<LinePart> {
     match swap_layout_name {
@@ -456,7 +456,7 @@ pub fn first_line(
     separator: &str,
 ) -> LinePart {
     let supports_arrow_fonts = !help.capabilities.arrow_fonts;
-    let colored_elements = color_elements(TermPalette::default(), !supports_arrow_fonts);
+    let colored_elements = color_elements(help.style.theme.styling, !supports_arrow_fonts);
     let binds = &help.get_mode_keybinds();
     // Unselect all by default
     let mut default_keys = vec![
@@ -546,7 +546,7 @@ pub fn first_line(
                 tab_info.is_swap_layout_dirty,
                 help,
                 colored_elements,
-                &TermPalette::default(),
+                &help.style.theme.styling,
                 separator,
             ) {
                 remaining_space -= swap_layout_status.len;
@@ -575,7 +575,7 @@ mod tests {
     use super::*;
 
     fn colored_elements() -> ColoredElements {
-        let palette = TermPalette::default();
+        let palette = ThemeColorAssignments::default();
         color_elements(palette, false)
     }
 

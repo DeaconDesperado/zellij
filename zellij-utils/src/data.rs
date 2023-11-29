@@ -16,20 +16,20 @@ pub type ClientId = u16; // TODO: merge with crate type?
 
 pub fn client_id_to_colors(
     client_id: ClientId,
-    colors: Palette,
+    colors: TermPalette,
 ) -> Option<(PaletteColor, PaletteColor)> {
     // (primary color, secondary color)
     match client_id {
-        1 => Some((colors.magenta(), colors.black())),
-        2 => Some((colors.blue(), colors.black())),
-        3 => Some((colors.purple(), colors.black())),
-        4 => Some((colors.yellow(), colors.black())),
-        5 => Some((colors.cyan(), colors.black())),
-        6 => Some((colors.gold(), colors.black())),
-        7 => Some((colors.red(), colors.black())),
-        8 => Some((colors.silver(), colors.black())),
-        9 => Some((colors.pink(), colors.black())),
-        10 => Some((colors.brown(), colors.black())),
+        1 => Some((colors.magenta, colors.black)),
+        2 => Some((colors.blue, colors.black)),
+        3 => Some((colors.purple, colors.black)),
+        4 => Some((colors.yellow, colors.black)),
+        5 => Some((colors.cyan, colors.black)),
+        6 => Some((colors.gold, colors.black)),
+        7 => Some((colors.red, colors.black)),
+        8 => Some((colors.silver, colors.black)),
+        9 => Some((colors.pink, colors.black)),
+        10 => Some((colors.brown, colors.black)),
         _ => None,
     }
 }
@@ -747,6 +747,8 @@ pub struct ThemeColorAssignments {
     pub key: StyleSpec,
     pub key_modifier: StyleSpec,
     pub selected_frame: StyleSpec,
+    pub text: StyleSpec,
+    pub error_text: StyleSpec,
 }
 
 impl Default for ThemeColorAssignments {
@@ -757,6 +759,8 @@ impl Default for ThemeColorAssignments {
             key: Default::default(),
             key_modifier: Default::default(),
             selected_frame: Default::default(),
+            text: Default::default(),
+            error_text: Default::default(),
         }
     }
 }

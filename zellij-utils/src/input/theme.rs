@@ -9,7 +9,7 @@ use std::{
 };
 
 use crate::{
-    data::{PaletteColor, ThemeColorAssignments, ThemeHue},
+    data::{PaletteColor, TermPalette, ThemeColorAssignments, ThemeHue},
     shared::colors,
 };
 
@@ -222,6 +222,31 @@ impl Palette {
             .get("brown")
             .unwrap_or(&PaletteColor::EightBit(colors::BROWN))
             .to_owned()
+    }
+}
+
+impl Into<TermPalette> for Palette {
+    fn into(self) -> TermPalette {
+        TermPalette {
+            fg: self.fg(),
+            bg: self.bg(),
+            black: self.black(),
+            red: self.red(),
+            green: self.green(),
+            yellow: self.yellow(),
+            blue: self.blue(),
+            magenta: self.magenta(),
+            cyan: self.cyan(),
+            white: self.white(),
+            orange: self.orange(),
+            gray: self.gray(),
+            purple: self.purple(),
+            gold: self.gold(),
+            silver: self.silver(),
+            pink: self.pink(),
+            brown: self.brown(),
+            ..Default::default()
+        }
     }
 }
 

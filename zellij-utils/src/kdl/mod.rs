@@ -1409,6 +1409,8 @@ impl TryFrom<(&KdlNode, &Palette)> for ThemeColorAssignments {
             key: StyleSpec::try_from((node, "key", palette))?,
             key_modifier: StyleSpec::try_from((node, "key_modifier", palette))?,
             selected_frame: StyleSpec::try_from((node, "selected_frame", palette))?,
+            text: StyleSpec::try_from((node, "text", palette))?,
+            error_text: StyleSpec::try_from((node, "error_text", palette))?,
         })
     }
 }
