@@ -80,9 +80,29 @@ pub struct Palette(BTreeMap<String, PaletteColor>);
 /// Provide color defaults for backward compatiblity
 impl Palette {
     pub fn new(colors: BTreeMap<String, PaletteColor>) -> Palette {
-        Palette(colors)
+        let mut defaults = BTreeMap::new();
+        defaults.insert("black".to_string(), PaletteColor::EightBit(colors::BLACK));
+        defaults.insert("red".to_string(), PaletteColor::EightBit(colors::RED));
+        defaults.insert("green".to_string(), PaletteColor::EightBit(colors::GREEN));
+        defaults.insert("yellow".to_string(), PaletteColor::EightBit(colors::YELLOW));
+        defaults.insert("blue".to_string(), PaletteColor::EightBit(colors::BLUE));
+        defaults.insert(
+            "magenta".to_string(),
+            PaletteColor::EightBit(colors::MAGENTA),
+        );
+        defaults.insert("cyan".to_string(), PaletteColor::EightBit(colors::CYAN));
+        defaults.insert("white".to_string(), PaletteColor::EightBit(colors::WHITE));
+        defaults.insert("orange".to_string(), PaletteColor::EightBit(colors::ORANGE));
+        defaults.insert("gray".to_string(), PaletteColor::EightBit(colors::GRAY));
+        defaults.insert("gold".to_string(), PaletteColor::EightBit(colors::GOLD));
+        defaults.insert("silver".to_string(), PaletteColor::EightBit(colors::SILVER));
+        defaults.insert("pink".to_string(), PaletteColor::EightBit(colors::PINK));
+        defaults.insert("brown".to_string(), PaletteColor::EightBit(colors::BROWN));
+        defaults.extend(colors);
+        Palette(defaults)
     }
 
+    //TODO: should this be a read-only reference?
     pub fn get(&self, key: &str) -> Option<PaletteColor> {
         self.0.get(key).copied()
     }
