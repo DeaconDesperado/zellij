@@ -23,6 +23,10 @@ pub struct ThemeColorAssignments {
     pub key_modifier: ::core::option::Option<StyleSpec>,
     #[prost(message, optional, tag = "5")]
     pub selected_frame: ::core::option::Option<StyleSpec>,
+    #[prost(message, optional, tag = "6")]
+    pub text: ::core::option::Option<StyleSpec>,
+    #[prost(message, optional, tag = "7")]
+    pub error_text: ::core::option::Option<StyleSpec>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

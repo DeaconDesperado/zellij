@@ -1889,6 +1889,7 @@ impl Themes {
         for theme_config in kdl_children_nodes_or_error!(themes_from_kdl, "no themes found") {
             let theme_name = kdl_name!(theme_config);
 
+            // TODO: allow this node to be absent
             let styling_node =
                 kdl_child_with_name!(theme_config, "styling").ok_or(ConfigError::new_kdl_error(
                     "Styling block invalid".into(),

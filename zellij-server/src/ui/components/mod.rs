@@ -87,7 +87,7 @@ impl<'a> UiComponentParser<'a> {
                 columns,
                 rows,
                 stringified_params,
-                Some(self.style.theme.green),
+                Some(self.style.theme.palette.green()),
                 &self.style,
                 component_coordinates,
             );
