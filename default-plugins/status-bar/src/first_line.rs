@@ -456,7 +456,8 @@ pub fn first_line(
     separator: &str,
 ) -> LinePart {
     let supports_arrow_fonts = !help.capabilities.arrow_fonts;
-    let colored_elements = color_elements(help.style.theme.styling, !supports_arrow_fonts);
+    let colored_elements =
+        color_elements(help.style.theme.styling.to_owned(), !supports_arrow_fonts);
     let binds = &help.get_mode_keybinds();
     // Unselect all by default
     let mut default_keys = vec![

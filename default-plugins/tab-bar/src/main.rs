@@ -106,7 +106,7 @@ impl ZellijPlugin for State {
                 tabname,
                 t,
                 is_alternate_tab,
-                self.mode_info.style.theme.palette.into(),
+                self.mode_info.style.theme.palette.to_owned().into(),
                 self.mode_info.capabilities,
             );
             is_alternate_tab = !is_alternate_tab;
@@ -117,7 +117,7 @@ impl ZellijPlugin for State {
             all_tabs,
             active_tab_index,
             cols.saturating_sub(1),
-            self.mode_info.style.theme.palette.into(),
+            self.mode_info.style.theme.palette.to_owned().into(),
             self.mode_info.capabilities,
             self.mode_info.style.hide_session_name,
         );

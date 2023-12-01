@@ -190,9 +190,8 @@ pub fn start_client(
     envs::set_zellij("0".to_string());
     config.env.set_vars();
 
-    let theme = config
-        .theme_config(&config_options)
-        .unwrap_or_else(|| os_input.load_palette());
+    let theme = config.theme_config(&config_options).unwrap();
+    //.unwrap_or_else(|| os_input.load_palette());
 
     let full_screen_ws = os_input.get_terminal_size_using_fd(0);
     let client_attributes = ClientAttributes {

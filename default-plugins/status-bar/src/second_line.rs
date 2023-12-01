@@ -264,7 +264,7 @@ fn get_keys_and_hints(mi: &ModeInfo) -> Vec<(String, String, Vec<Key>)> {
 fn full_shortcut_list(help: &ModeInfo, tip: TipFn) -> LinePart {
     match help.mode {
         InputMode::Normal => tip(help),
-        InputMode::Locked => locked_interface_indication(help.style.theme.styling),
+        InputMode::Locked => locked_interface_indication(help.style.theme.styling.to_owned()),
         _ => full_shortcut_list_nonstandard_mode(help),
     }
 }

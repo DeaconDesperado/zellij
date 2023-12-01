@@ -1079,7 +1079,7 @@ impl Grid {
                 .selection
                 .contains_row(character_chunk.y.saturating_sub(content_y))
             {
-                let background_color = match style.theme.bg {
+                let background_color = match style.theme.palette.bg() {
                     PaletteColor::Rgb(rgb) => AnsiCode::RgbCode(rgb),
                     PaletteColor::EightBit(col) => AnsiCode::ColorIndex(col),
                 };
@@ -1095,9 +1095,9 @@ impl Grid {
                     if res.contains_row(character_chunk.y.saturating_sub(content_y)) {
                         let (select_background_palette, select_foreground_palette) =
                             if Some(res) == self.search_results.active.as_ref() {
-                                (style.theme.orange, style.theme.black)
+                                (style.theme.palette.orange(), style.theme.palette.black())
                             } else {
-                                (style.theme.green, style.theme.black)
+                                (style.theme.palette.green(), style.theme.palette.black())
                             };
                         let background_color = match select_background_palette {
                             PaletteColor::Rgb(rgb) => AnsiCode::RgbCode(rgb),
