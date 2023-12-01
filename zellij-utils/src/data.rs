@@ -740,7 +740,7 @@ pub struct StyleSpec {
 }
 
 // TODO: Match the default assignments to existing colors for backward compat
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct ThemeColorAssignments {
     pub selected_ribbon: StyleSpec,
     pub unselected_ribbon: StyleSpec,
