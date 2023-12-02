@@ -14,15 +14,15 @@ pub fn ribbon(
     let colors = style.theme.palette;
     let (first_arrow_styles, text_style, last_arrow_styles) = if content.selected {
         (
-            character_style(colors.black(), colors.green()),
-            character_style(colors.black(), colors.green()),
-            character_style(colors.green(), colors.black()),
+            character_style(colors.black, colors.green),
+            character_style(colors.black, colors.green),
+            character_style(colors.green, colors.black),
         )
     } else {
         (
-            character_style(colors.black(), colors.fg()),
-            character_style(colors.black(), colors.fg()),
-            character_style(colors.fg(), colors.black()),
+            character_style(colors.black, colors.fg),
+            character_style(colors.black, colors.fg),
+            character_style(colors.fg, colors.black),
         )
     };
     let (text, _text_width) =
@@ -47,19 +47,19 @@ pub fn ribbon(
 
 pub fn emphasis_variants_for_ribbon(style: &Style) -> [PaletteColor; 4] {
     [
-        style.theme.palette.red(),
-        style.theme.palette.white(),
-        style.theme.palette.blue(),
-        style.theme.palette.magenta(),
+        style.theme.palette.red,
+        style.theme.palette.white,
+        style.theme.palette.blue,
+        style.theme.palette.magenta,
     ]
 }
 
 pub fn emphasis_variants_for_selected_ribbon(style: &Style) -> [PaletteColor; 4] {
     [
-        style.theme.palette.red(),
-        style.theme.palette.orange(),
-        style.theme.palette.magenta(),
-        style.theme.palette.blue(),
+        style.theme.palette.red,
+        style.theme.palette.orange,
+        style.theme.palette.magenta,
+        style.theme.palette.blue,
     ]
 }
 

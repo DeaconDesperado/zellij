@@ -1430,7 +1430,7 @@ macro_rules! kdl_get_color_by_name_from_palette {
             ))
             .and_then(|c| {
                 $palette.get(c).ok_or(ConfigError::new_kdl_error(
-                    format!("No color in palette {}", c),
+                    format!("No color in palette {}, colors {:?}", c, $palette),
                     $kdl_node.span().offset(),
                     $kdl_node.span().len(),
                 ))
@@ -1480,6 +1480,7 @@ impl Options {
             kdl_property_first_arg_as_bool_or_error!(kdl_options, "auto_layout").map(|(v, _)| v);
         let theme = kdl_property_first_arg_as_string_or_error!(kdl_options, "theme")
             .map(|(theme, _entry)| theme.to_string());
+        log::info!("theme: {:?}", theme);
         let default_mode =
             match kdl_property_first_arg_as_string_or_error!(kdl_options, "default_mode") {
                 Some((string, entry)) => Some(InputMode::from_str(string).map_err(|_| {
@@ -1906,11 +1907,10 @@ impl Themes {
             }
 
             let palette = Palette::new(colors);
-            let styling =
-                ThemeColorAssignments::try_from((styling_node, &palette)).unwrap_or_default();
+            let styling = ThemeColorAssignments::try_from((styling_node, &palette)).unwrap();
             let theme = Theme {
-                styling,
-                palette,
+                styling: styling,
+                palette: palette.into(),
                 ..Default::default()
             };
             themes.insert(theme_name.into(), theme);

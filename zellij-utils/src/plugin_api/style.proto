@@ -6,7 +6,7 @@ message Style {
   Palette palette = 1;
   bool rounded_corners = 2;
   bool hide_session_name = 3;
-  ThemeColorAssignments theme_colors = 4;
+  ThemeColorAssignments styling = 4;
 }
 
 message ThemeColorAssignments {

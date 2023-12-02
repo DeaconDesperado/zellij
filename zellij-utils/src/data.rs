@@ -34,8 +34,8 @@ pub fn client_id_to_colors(
     }
 }
 
-pub fn single_client_color(colors: Palette) -> (PaletteColor, PaletteColor) {
-    (colors.green(), colors.black())
+pub fn single_client_color(colors: TermPalette) -> (PaletteColor, PaletteColor) {
+    (colors.green, colors.black)
 }
 
 // TODO: Add a shortened string representation (beyond `Display::fmt` below) that can be used when
@@ -739,7 +739,6 @@ pub struct StyleSpec {
     //TODO: bold ul
 }
 
-// TODO: Match the default assignments to existing colors for backward compat
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct ThemeColorAssignments {
     pub selected_ribbon: StyleSpec,
@@ -751,10 +750,14 @@ pub struct ThemeColorAssignments {
     pub error_text: StyleSpec,
 }
 
+// TODO: Match the default assignments to existing colors for backward compat
 impl Default for ThemeColorAssignments {
     fn default() -> Self {
         Self {
-            selected_ribbon: Default::default(),
+            selected_ribbon: StyleSpec {
+                fg: PaletteColor::Rgb((220, 215, 186)),
+                bg: PaletteColor::Rgb((220, 215, 120)),
+            },
             unselected_ribbon: Default::default(),
             key: Default::default(),
             key_modifier: Default::default(),
@@ -765,7 +768,7 @@ impl Default for ThemeColorAssignments {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub struct Style {
     pub theme: Theme,
     pub rounded_corners: bool,

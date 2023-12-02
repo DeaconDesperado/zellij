@@ -14,7 +14,7 @@ use zellij_utils::errors::prelude::*;
 pub fn text(content: Text, style: &Style, component_coordinates: Option<Coordinates>) -> Vec<u8> {
     let mut text_style = RESET_STYLES.bold(Some(AnsiCode::On));
     if content.selected {
-        text_style = text_style.background(Some(style.theme.palette.bg().into()));
+        text_style = text_style.background(Some(style.theme.palette.bg.into()));
     }
     let (text, _text_width) =
         stringify_text(&content, None, &component_coordinates, style, text_style);
@@ -72,10 +72,10 @@ pub fn color_index_character(
 
 pub fn emphasis_variants(style: &Style) -> [PaletteColor; 4] {
     [
-        style.theme.palette.orange(),
-        style.theme.palette.cyan(),
-        style.theme.palette.green(),
-        style.theme.palette.magenta(),
+        style.theme.palette.orange,
+        style.theme.palette.cyan,
+        style.theme.palette.green,
+        style.theme.palette.magenta,
     ]
 }
 

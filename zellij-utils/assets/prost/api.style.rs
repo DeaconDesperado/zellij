@@ -8,7 +8,7 @@ pub struct Style {
     #[prost(bool, tag = "3")]
     pub hide_session_name: bool,
     #[prost(message, optional, tag = "4")]
-    pub theme_colors: ::core::option::Option<ThemeColorAssignments>,
+    pub styling: ::core::option::Option<ThemeColorAssignments>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

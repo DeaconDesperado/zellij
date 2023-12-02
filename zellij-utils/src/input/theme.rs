@@ -250,9 +250,9 @@ impl Into<TermPalette> for Palette {
     }
 }
 
-#[derive(Default, Hash, Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Copy, Default, Hash, Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Theme {
-    pub palette: Palette,
+    pub palette: TermPalette,
     pub styling: ThemeColorAssignments,
 }
 

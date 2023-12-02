@@ -1,19 +1,26 @@
 use super::generated_api::api::style::{
     color::Payload as ProtobufColorPayload, Color as ProtobufColor, ColorType as ProtobufColorType,
     Palette as ProtobufPalette, RgbColorPayload as ProtobufRgbColorPayload, Style as ProtobufStyle,
-    ThemeColorAssignments as ProtobufThemeColorAssignments, ThemeHue as ProtobufThemeHue,
+    StyleSpec as ProtobufStyleSpec, ThemeColorAssignments as ProtobufThemeColorAssignments,
+    ThemeHue as ProtobufThemeHue,
 };
-use crate::data::{PaletteColor, Style, TermPalette, ThemeHue};
+use crate::data::{PaletteColor, Style, StyleSpec, TermPalette, ThemeColorAssignments, ThemeHue};
 use crate::errors::prelude::*;
+use crate::input::theme::Theme;
 
 use std::convert::TryFrom;
 
 impl TryFrom<ProtobufStyle> for Style {
     type Error = &'static str;
     fn try_from(protobuf_style: ProtobufStyle) -> Result<Self, &'static str> {
+        let palette = protobuf_style.palette.ok_or("Invalid palette")?;
+        let styling = protobuf_style.styling.ok_or("Invalid style")?;
+
         Ok(Style {
-            // TODO: default
-            theme: Default::default(),
+            theme: Theme {
+                palette: TermPalette::try_from(palette)?,
+                styling: ThemeColorAssignments::try_from(styling)?,
+            },
             rounded_corners: protobuf_style.rounded_corners,
             hide_session_name: protobuf_style.hide_session_name,
         })
@@ -23,12 +30,14 @@ impl TryFrom<ProtobufStyle> for Style {
 impl TryFrom<Style> for ProtobufStyle {
     type Error = &'static str;
     fn try_from(style: Style) -> Result<Self, &'static str> {
+        let palette = ProtobufPalette::try_from(style.theme.palette)?;
+        let styling = ProtobufThemeColorAssignments::try_from(style.theme.styling)?;
+
         Ok(ProtobufStyle {
-            //TODO: Nones
-            palette: None,
+            palette: Some(palette),
             rounded_corners: style.rounded_corners,
             hide_session_name: style.hide_session_name,
-            theme_colors: None,
+            styling: Some(styling),
         })
     }
 }
@@ -209,5 +218,124 @@ impl TryFrom<ProtobufThemeHue> for ThemeHue {
             ProtobufThemeHue::Light => Ok(ThemeHue::Light),
             ProtobufThemeHue::Dark => Ok(ThemeHue::Dark),
         }
+    }
+}
+
+impl TryFrom<ProtobufThemeColorAssignments> for ThemeColorAssignments {
+    type Error = &'static str;
+
+    fn try_from(value: ProtobufThemeColorAssignments) -> std::result::Result<Self, Self::Error> {
+        let selected_ribbon = value
+            .selected_ribbon
+            .ok_or("missing")
+            .and_then(|v| StyleSpec::try_from(v))?;
+
+        let unselected_ribbon = value
+            .unselected_ribbon
+            .ok_or("missing")
+            .and_then(|v| StyleSpec::try_from(v))?;
+
+        let key = value
+            .key
+            .ok_or("missing")
+            .and_then(|v| StyleSpec::try_from(v))?;
+
+        let key_modifier = value
+            .key_modifier
+            .ok_or("missing")
+            .and_then(|v| StyleSpec::try_from(v))?;
+
+        let text = value
+            .text
+            .ok_or("missing")
+            .and_then(|v| StyleSpec::try_from(v))?;
+
+        let error_text = value
+            .error_text
+            .ok_or("missing")
+            .and_then(|v| StyleSpec::try_from(v))?;
+
+        let selected_frame = value
+            .selected_frame
+            .ok_or("missing")
+            .and_then(|v| StyleSpec::try_from(v))?;
+
+        Ok(ThemeColorAssignments {
+            selected_ribbon,
+            unselected_ribbon,
+            key,
+            key_modifier,
+            selected_frame,
+            text,
+            error_text,
+        })
+    }
+}
+
+impl TryFrom<ThemeColorAssignments> for ProtobufThemeColorAssignments {
+    type Error = &'static str;
+
+    fn try_from(value: ThemeColorAssignments) -> std::result::Result<Self, Self::Error> {
+        Ok(ProtobufThemeColorAssignments {
+            selected_ribbon: Some(ProtobufStyleSpec {
+                fg: Some(value.selected_ribbon.fg.try_into()?),
+                bg: Some(value.selected_ribbon.bg.try_into()?),
+            }),
+            unselected_ribbon: Some(ProtobufStyleSpec {
+                fg: Some(value.unselected_ribbon.fg.try_into()?),
+                bg: Some(value.unselected_ribbon.bg.try_into()?),
+            }),
+            text: Some(ProtobufStyleSpec {
+                fg: Some(value.text.fg.try_into()?),
+                bg: Some(value.text.bg.try_into()?),
+            }),
+            key: Some(ProtobufStyleSpec {
+                fg: Some(value.key.fg.try_into()?),
+                bg: Some(value.key.bg.try_into()?),
+            }),
+            key_modifier: Some(ProtobufStyleSpec {
+                fg: Some(value.key_modifier.fg.try_into()?),
+                bg: Some(value.key_modifier.bg.try_into()?),
+            }),
+            error_text: Some(ProtobufStyleSpec {
+                fg: Some(value.error_text.fg.try_into()?),
+                bg: Some(value.error_text.bg.try_into()?),
+            }),
+            selected_frame: Some(ProtobufStyleSpec {
+                fg: Some(value.selected_frame.fg.try_into()?),
+                bg: Some(value.selected_frame.bg.try_into()?),
+            }),
+        })
+    }
+}
+
+impl TryFrom<ProtobufStyleSpec> for StyleSpec {
+    type Error = &'static str;
+
+    fn try_from(value: ProtobufStyleSpec) -> std::result::Result<Self, Self::Error> {
+        let fg = value
+            .fg
+            .ok_or("foreground color missing")
+            .and_then(|f| PaletteColor::try_from(f))?;
+
+        let bg = value
+            .bg
+            .ok_or("background color missing")
+            .and_then(|f| PaletteColor::try_from(f))?;
+
+        Ok(StyleSpec { fg, bg })
+    }
+}
+
+impl TryFrom<StyleSpec> for ProtobufStyleSpec {
+    type Error = &'static str;
+
+    fn try_from(value: StyleSpec) -> std::result::Result<Self, Self::Error> {
+        let fg = ProtobufColor::try_from(value.fg)?;
+        let bg = ProtobufColor::try_from(value.bg)?;
+        Ok(ProtobufStyleSpec {
+            fg: Some(fg),
+            bg: Some(bg),
+        })
     }
 }

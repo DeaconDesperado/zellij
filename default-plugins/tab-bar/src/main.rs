@@ -127,9 +127,9 @@ impl ZellijPlugin for State {
             .iter()
             .fold(String::new(), |output, part| output + &part.part);
 
-        let background = match self.mode_info.style.theme.palette.theme_hue() {
-            ThemeHue::Dark => self.mode_info.style.theme.palette.black(),
-            ThemeHue::Light => self.mode_info.style.theme.palette.white(),
+        let background = match self.mode_info.style.theme.palette.theme_hue {
+            ThemeHue::Dark => self.mode_info.style.theme.palette.black,
+            ThemeHue::Light => self.mode_info.style.theme.palette.white,
         };
         match background {
             PaletteColor::Rgb((r, g, b)) => {

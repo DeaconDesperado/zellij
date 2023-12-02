@@ -16,7 +16,7 @@ fn populate_tabs_in_tab_line(
     tabs_after_active: &mut Vec<LinePart>,
     tabs_to_render: &mut Vec<LinePart>,
     cols: usize,
-    palette: &Palette,
+    palette: TermPalette,
     capabilities: PluginCapabilities,
 ) {
     let mut middle_size = get_current_title_len(tabs_to_render);
@@ -31,7 +31,7 @@ fn populate_tabs_in_tab_line(
         let left_more_tab_index = left_count.saturating_sub(1);
         let collapsed_left = left_more_message(
             left_count,
-            &palette,
+            palette,
             tab_separator(capabilities),
             left_more_tab_index,
         );
@@ -39,7 +39,7 @@ fn populate_tabs_in_tab_line(
         let right_more_tab_index = left_count + tabs_to_render.len();
         let collapsed_right = right_more_message(
             right_count,
-            &palette,
+            palette,
             tab_separator(capabilities),
             right_more_tab_index,
         );
@@ -107,7 +107,7 @@ fn populate_tabs_in_tab_line(
 
 fn left_more_message(
     tab_count_to_the_left: usize,
-    palette: &Palette,
+    palette: TermPalette,
     separator: &str,
     tab_index: usize,
 ) -> LinePart {
@@ -122,13 +122,13 @@ fn left_more_message(
     // 238
     // chars length plus separator length on both sides
     let more_text_len = more_text.width() + 2 * separator.width();
-    let (text_color, sep_color) = match palette.theme_hue() {
-        ThemeHue::Dark => (palette.white(), palette.black()),
-        ThemeHue::Light => (palette.black(), palette.white()),
+    let (text_color, sep_color) = match palette.theme_hue {
+        ThemeHue::Dark => (palette.white, palette.black),
+        ThemeHue::Light => (palette.black, palette.white),
     };
-    let left_separator = style!(sep_color, palette.orange()).paint(separator);
-    let more_styled_text = style!(text_color, palette.orange()).bold().paint(more_text);
-    let right_separator = style!(palette.orange(), sep_color).paint(separator);
+    let left_separator = style!(sep_color, palette.orange).paint(separator);
+    let more_styled_text = style!(text_color, palette.orange).bold().paint(more_text);
+    let right_separator = style!(palette.orange, sep_color).paint(separator);
     let more_styled_text =
         ANSIStrings(&[left_separator, more_styled_text, right_separator]).to_string();
     LinePart {
@@ -140,7 +140,7 @@ fn left_more_message(
 
 fn right_more_message(
     tab_count_to_the_right: usize,
-    palette: &Palette,
+    palette: TermPalette,
     separator: &str,
     tab_index: usize,
 ) -> LinePart {
@@ -154,13 +154,13 @@ fn right_more_message(
     };
     // chars length plus separator length on both sides
     let more_text_len = more_text.width() + 2 * separator.width();
-    let (text_color, sep_color) = match palette.theme_hue() {
-        ThemeHue::Dark => (palette.white(), palette.black()),
-        ThemeHue::Light => (palette.black(), palette.white()),
+    let (text_color, sep_color) = match palette.theme_hue {
+        ThemeHue::Dark => (palette.white, palette.black),
+        ThemeHue::Light => (palette.black, palette.white),
     };
-    let left_separator = style!(sep_color, palette.orange()).paint(separator);
-    let more_styled_text = style!(text_color, palette.orange()).bold().paint(more_text);
-    let right_separator = style!(palette.orange(), sep_color).paint(separator);
+    let left_separator = style!(sep_color, palette.orange).paint(separator);
+    let more_styled_text = style!(text_color, palette.orange).bold().paint(more_text);
+    let right_separator = style!(palette.orange, sep_color).paint(separator);
     let more_styled_text =
         ANSIStrings(&[left_separator, more_styled_text, right_separator]).to_string();
     LinePart {
@@ -173,24 +173,24 @@ fn right_more_message(
 fn tab_line_prefix(
     session_name: Option<&str>,
     mode: InputMode,
-    palette: &Palette,
+    palette: TermPalette,
     cols: usize,
 ) -> Vec<LinePart> {
     let prefix_text = " Zellij ".to_string();
 
     let prefix_text_len = prefix_text.chars().count();
-    let text_color = match palette.theme_hue() {
-        ThemeHue::Dark => palette.white(),
-        ThemeHue::Light => palette.black(),
+    let text_color = match palette.theme_hue {
+        ThemeHue::Dark => palette.white,
+        ThemeHue::Light => palette.black,
     };
-    let bg_color = match palette.theme_hue() {
-        ThemeHue::Dark => palette.black(),
-        ThemeHue::Light => palette.white(),
+    let bg_color = match palette.theme_hue {
+        ThemeHue::Dark => palette.black,
+        ThemeHue::Light => palette.white,
     };
 
-    let locked_mode_color = palette.magenta();
-    let normal_mode_color = palette.green();
-    let other_modes_color = palette.orange();
+    let locked_mode_color = palette.magenta;
+    let normal_mode_color = palette.green;
+    let other_modes_color = palette.orange;
 
     let prefix_styled_text = style!(text_color, bg_color).bold().paint(prefix_text);
     let mut parts = vec![LinePart {
@@ -201,9 +201,9 @@ fn tab_line_prefix(
     if let Some(name) = session_name {
         let name_part = format!("({}) ", name);
         let name_part_len = name_part.width();
-        let text_color = match palette.theme_hue() {
-            ThemeHue::Dark => palette.white(),
-            ThemeHue::Light => palette.black(),
+        let text_color = match palette.theme_hue {
+            ThemeHue::Dark => palette.white,
+            ThemeHue::Light => palette.black,
         };
         let name_part_styled_text = style!(text_color, bg_color).bold().paint(name_part);
         if cols.saturating_sub(prefix_text_len) >= name_part_len {
@@ -253,7 +253,7 @@ pub fn tab_line(
     mut all_tabs: Vec<LinePart>,
     active_tab_index: usize,
     cols: usize,
-    palette: Palette,
+    palette: TermPalette,
     capabilities: PluginCapabilities,
     hide_session_name: bool,
     mode: InputMode,
@@ -268,8 +268,8 @@ pub fn tab_line(
         tabs_before_active.pop().unwrap()
     };
     let mut prefix = match hide_session_name {
-        true => tab_line_prefix(None, mode, &palette, cols),
-        false => tab_line_prefix(session_name, mode, &palette, cols),
+        true => tab_line_prefix(None, mode, palette, cols),
+        false => tab_line_prefix(session_name, mode, palette, cols),
     };
     let prefix_len = get_current_title_len(&prefix);
 
@@ -285,7 +285,7 @@ pub fn tab_line(
         &mut tabs_after_active,
         &mut tabs_to_render,
         cols.saturating_sub(prefix_len),
-        &palette,
+        palette,
         capabilities,
     );
     prefix.append(&mut tabs_to_render);
@@ -298,17 +298,13 @@ pub fn tab_line(
             active_swap_layout_name,
             is_swap_layout_dirty,
             mode,
-            &palette,
+            palette,
             tab_separator(capabilities),
         ) {
             remaining_space -= swap_layout_status.len;
             let mut buffer = String::new();
             for _ in 0..remaining_space {
-                buffer.push_str(
-                    &style!(palette.black(), palette.black())
-                        .paint(" ")
-                        .to_string(),
-                );
+                buffer.push_str(&style!(palette.black, palette.black).paint(" ").to_string());
             }
             prefix.push(LinePart {
                 part: buffer,
@@ -327,7 +323,7 @@ fn swap_layout_status(
     swap_layout_name: &Option<String>,
     is_swap_layout_damaged: bool,
     input_mode: InputMode,
-    palette: &Palette,
+    palette: TermPalette,
     separator: &str,
 ) -> Option<LinePart> {
     match swap_layout_name {
@@ -339,27 +335,27 @@ fn swap_layout_status(
             let (prefix_separator, swap_layout_name, suffix_separator) =
                 if input_mode == InputMode::Locked {
                     (
-                        style!(palette.black(), palette.fg()).paint(separator),
-                        style!(palette.black(), palette.fg())
+                        style!(palette.black, palette.fg).paint(separator),
+                        style!(palette.black, palette.fg)
                             .italic()
                             .paint(&swap_layout_name),
-                        style!(palette.fg(), palette.black()).paint(separator),
+                        style!(palette.fg, palette.black).paint(separator),
                     )
                 } else if is_swap_layout_damaged {
                     (
-                        style!(palette.black(), palette.fg()).paint(separator),
-                        style!(palette.black(), palette.fg())
+                        style!(palette.black, palette.fg).paint(separator),
+                        style!(palette.black, palette.fg)
                             .bold()
                             .paint(&swap_layout_name),
-                        style!(palette.fg(), palette.black()).paint(separator),
+                        style!(palette.fg, palette.black).paint(separator),
                     )
                 } else {
                     (
-                        style!(palette.black(), palette.green()).paint(separator),
-                        style!(palette.black(), palette.green())
+                        style!(palette.black, palette.green).paint(separator),
+                        style!(palette.black, palette.green)
                             .bold()
                             .paint(&swap_layout_name),
-                        style!(palette.green(), palette.black()).paint(separator),
+                        style!(palette.green, palette.black).paint(separator),
                     )
                 };
             let swap_layout_indicator = format!(
