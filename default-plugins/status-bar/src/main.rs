@@ -89,37 +89,31 @@ fn color_elements(
 ) -> ColoredElements {
     ColoredElements {
         selected: SegmentStyle {
-            prefix_separator: style!(palette.selected_ribbon.fg, palette.selected_ribbon.bg),
+            prefix_separator: style!(palette.text.bg, palette.selected_ribbon.bg),
             char_left_separator: style!(palette.selected_ribbon.fg, palette.selected_ribbon.bg),
             char_shortcut: style!(palette.selected_ribbon.fg, palette.selected_ribbon.bg),
             char_right_separator: style!(palette.selected_ribbon.fg, palette.selected_ribbon.bg),
             styled_text: style!(palette.selected_ribbon.fg, palette.selected_ribbon.bg),
-            suffix_separator: style!(palette.selected_ribbon.fg, palette.selected_ribbon.bg),
+            suffix_separator: style!(palette.selected_ribbon.bg, palette.text.bg),
         },
         unselected: SegmentStyle {
-            prefix_separator: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
-            char_left_separator: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
-            char_shortcut: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
-            char_right_separator: style!(
-                palette.unselected_ribbon.fg,
-                palette.unselected_ribbon.bg
-            ),
+            prefix_separator: style!(palette.text.bg, palette.unselected_ribbon.bg),
+            char_left_separator: style!(palette.key.fg, palette.unselected_ribbon.bg),
+            char_shortcut: style!(palette.key.fg, palette.unselected_ribbon.bg),
+            char_right_separator: style!(palette.key.fg, palette.unselected_ribbon.bg),
             styled_text: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
-            suffix_separator: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
+            suffix_separator: style!(palette.unselected_ribbon.bg, palette.text.bg),
         },
         unselected_alternate: SegmentStyle {
-            prefix_separator: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
-            char_left_separator: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
-            char_shortcut: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
-            char_right_separator: style!(
-                palette.unselected_ribbon.fg,
-                palette.unselected_ribbon.bg
-            ),
+            prefix_separator: style!(palette.text.bg, palette.unselected_ribbon.bg),
+            char_left_separator: style!(palette.key.fg, palette.unselected_ribbon.bg),
+            char_shortcut: style!(palette.key.fg, palette.unselected_ribbon.bg),
+            char_right_separator: style!(palette.key.fg, palette.unselected_ribbon.bg),
             styled_text: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
-            suffix_separator: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
+            suffix_separator: style!(palette.unselected_ribbon.bg, palette.text.bg),
         },
         disabled: SegmentStyle {
-            prefix_separator: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
+            prefix_separator: style!(palette.unselected_ribbon.bg, palette.unselected_ribbon.fg),
             char_left_separator: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
             char_shortcut: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
             char_right_separator: style!(
@@ -127,10 +121,10 @@ fn color_elements(
                 palette.unselected_ribbon.bg
             ),
             styled_text: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
-            suffix_separator: style!(palette.unselected_ribbon.fg, palette.unselected_ribbon.bg),
+            suffix_separator: style!(palette.unselected_ribbon.bg, palette.unselected_ribbon.fg),
         },
-        superkey_prefix: style!(palette.key_modifier.fg, palette.key_modifier.fg).bold(),
-        superkey_suffix_separator: style!(palette.key_modifier.fg, palette.key_modifier.bg),
+        superkey_prefix: style!(palette.key_modifier.fg, palette.key_modifier.bg).bold(),
+        superkey_suffix_separator: style!(palette.text.bg, palette.text.bg),
     }
 }
 
@@ -370,7 +364,7 @@ pub fn style_key_with_modifier(
     }
 
     let text_color = palette_match!(palette.text.fg);
-    let strong_text_color = palette_match!(palette.key_modifier.fg);
+    let strong_text_color = palette_match!(palette.key.fg);
     let mod_color = palette_match!(palette.key_modifier.fg);
     let mut ret = vec![];
 
