@@ -24,9 +24,10 @@ fn full_length_shortcut(
     }
 
     let text_color = palette_match!(palette.text.fg);
+    let bg = palette.text.bg;
     let separator = if is_first_shortcut { " " } else { " / " };
     let mut bits: Vec<ANSIString> = vec![Style::new().fg(text_color).paint(separator)];
-    bits.extend(style_key_with_modifier(&key, &palette, None));
+    bits.extend(style_key_with_modifier(&key, &palette, Some(bg)));
     bits.push(
         Style::new()
             .fg(text_color)
