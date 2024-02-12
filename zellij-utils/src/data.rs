@@ -1,6 +1,5 @@
 use crate::input::actions::Action;
 use crate::input::config::ConversionError;
-use crate::input::theme::Palette;
 use crate::input::theme::Theme;
 use crate::shared::default_palette;
 use clap::ArgEnum;
