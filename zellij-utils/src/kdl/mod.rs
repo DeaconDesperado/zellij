@@ -515,19 +515,10 @@ impl Action {
     }
 }
 
-impl TryFrom<(&str, &KdlDocument)> for PaletteColor {
+impl TryFrom<&KdlNode> for PaletteColor {
     type Error = ConfigError;
 
-    fn try_from(
-        (color_name, theme_colors): (&str, &KdlDocument),
-    ) -> Result<PaletteColor, Self::Error> {
-        let color = theme_colors
-            .get(color_name)
-            .ok_or(ConfigError::new_kdl_error(
-                format!("Missing theme color: {}", color_name),
-                theme_colors.span().offset(),
-                theme_colors.span().len(),
-            ))?;
+    fn try_from(color: &KdlNode) -> Result<PaletteColor, Self::Error> {
         let entry_count = entry_count!(color);
         let is_rgb = || entry_count == 3;
         let is_three_digit_hex = || {
@@ -1860,6 +1851,20 @@ impl Themes {
         for theme_config in kdl_children_nodes_or_error!(themes_from_kdl, "no themes found") {
             let theme_name = kdl_name!(theme_config);
             let theme_colors = kdl_children_or_error!(theme_config, "empty theme");
+            let styling_node =
+                kdl_child_with_name!(theme_config, "styling").ok_or(ConfigError::new_kdl_error(
+                    "Styling block invalid".into(),
+                    theme_config.span().offset(),
+                    theme_config.span().len(),
+                ))?;
+
+            let mut colors = BTreeMap::new();
+            let color_nodes = kdl_children_nodes_or_error!(theme_config, "Palette is empty").iter();
+            for color in color_nodes.filter(|n| n.name().value() != "styling") {
+                let color_name = kdl_name!(color);
+                let color = PaletteColor::try_from(color)?;
+                colors.insert(color_name.to_owned(), color);
+            }
             let theme = Theme {
                 palette: Palette {
                     fg: PaletteColor::try_from(("fg", theme_colors))?,
