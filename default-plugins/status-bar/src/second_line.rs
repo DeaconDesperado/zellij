@@ -17,16 +17,13 @@ fn full_length_shortcut(
     is_first_shortcut: bool,
     key: Vec<Key>,
     action: &str,
-    palette: Palette,
+    palette: Styling,
 ) -> LinePart {
     if key.is_empty() {
         return LinePart::default();
     }
 
-    let text_color = palette_match!(match palette.theme_hue {
-        ThemeHue::Dark => palette.white,
-        ThemeHue::Light => palette.black,
-    });
+    let text_color = palette_match!(palette.text_unselected[0]);
 
     let separator = if is_first_shortcut { " " } else { " / " };
     let mut bits: Vec<ANSIString> = vec![Style::new().fg(text_color).paint(separator)];
@@ -45,13 +42,10 @@ fn full_length_shortcut(
     }
 }
 
-fn locked_interface_indication(palette: Palette) -> LinePart {
+fn locked_interface_indication(palette: Styling) -> LinePart {
     let locked_text = " -- INTERFACE LOCKED -- ";
     let locked_text_len = locked_text.chars().count();
-    let text_color = palette_match!(match palette.theme_hue {
-        ThemeHue::Dark => palette.white,
-        ThemeHue::Light => palette.black,
-    });
+    let text_color = palette_match!(palette.text_unselected[0]);
     let locked_styled_text = Style::new().fg(text_color).bold().paint(locked_text);
     LinePart {
         part: locked_styled_text.to_string(),
@@ -61,9 +55,9 @@ fn locked_interface_indication(palette: Palette) -> LinePart {
 
 fn add_shortcut(help: &ModeInfo, linepart: &LinePart, text: &str, keys: Vec<Key>) -> LinePart {
     let shortcut = if linepart.len == 0 {
-        full_length_shortcut(true, keys, text, help.style.colors)
+        full_length_shortcut(true, keys, text, help.style.styling)
     } else {
-        full_length_shortcut(false, keys, text, help.style.colors)
+        full_length_shortcut(false, keys, text, help.style.styling)
     };
 
     let mut new_linepart = LinePart::default();
@@ -271,7 +265,7 @@ fn get_keys_and_hints(mi: &ModeInfo) -> Vec<(String, String, Vec<Key>)> {
 fn full_shortcut_list(help: &ModeInfo, tip: TipFn) -> LinePart {
     match help.mode {
         InputMode::Normal => tip(help),
-        InputMode::Locked => locked_interface_indication(help.style.colors),
+        InputMode::Locked => locked_interface_indication(help.style.styling),
         _ => full_shortcut_list_nonstandard_mode(help),
     }
 }
@@ -289,7 +283,7 @@ fn shortened_shortcut_list_nonstandard_mode(help: &ModeInfo) -> LinePart {
 fn shortened_shortcut_list(help: &ModeInfo, tip: TipFn) -> LinePart {
     match help.mode {
         InputMode::Normal => tip(help),
-        InputMode::Locked => locked_interface_indication(help.style.colors),
+        InputMode::Locked => locked_interface_indication(help.style.styling),
         _ => shortened_shortcut_list_nonstandard_mode(help),
     }
 }
@@ -321,7 +315,7 @@ fn best_effort_shortcut_list(help: &ModeInfo, tip: TipFn, max_len: usize) -> Lin
             }
         },
         InputMode::Locked => {
-            let line_part = locked_interface_indication(help.style.colors);
+            let line_part = locked_interface_indication(help.style.styling);
             if line_part.len <= max_len {
                 line_part
             } else {
@@ -349,8 +343,8 @@ pub fn keybinds(help: &ModeInfo, tip_name: &str, max_width: usize) -> LinePart {
     best_effort_shortcut_list(help, tip_body.short, max_width)
 }
 
-pub fn text_copied_hint(palette: &Palette, copy_destination: CopyDestination) -> LinePart {
-    let green_color = palette_match!(palette.green);
+pub fn text_copied_hint(palette: &Styling, copy_destination: CopyDestination) -> LinePart {
+    let green_color = palette_match!(palette.text_unselected[1]);
     let hint = match copy_destination {
         CopyDestination::Command => "Text piped to external command",
         #[cfg(not(target_os = "macos"))]
@@ -365,22 +359,19 @@ pub fn text_copied_hint(palette: &Palette, copy_destination: CopyDestination) ->
     }
 }
 
-pub fn system_clipboard_error(palette: &Palette) -> LinePart {
+pub fn system_clipboard_error(palette: &Styling) -> LinePart {
     let hint = " Error using the system clipboard.";
-    let red_color = palette_match!(palette.red);
+    let red_color = palette_match!(palette.text_unselected[4]);
     LinePart {
         part: Style::new().fg(red_color).bold().paint(hint).to_string(),
         len: hint.len(),
     }
 }
 
-pub fn fullscreen_panes_to_hide(palette: &Palette, panes_to_hide: usize) -> LinePart {
-    let text_color = palette_match!(match palette.theme_hue {
-        ThemeHue::Dark => palette.white,
-        ThemeHue::Light => palette.black,
-    });
-    let green_color = palette_match!(palette.green);
-    let orange_color = palette_match!(palette.orange);
+pub fn fullscreen_panes_to_hide(palette: &Styling, panes_to_hide: usize) -> LinePart {
+    let text_color = palette_match!(palette.text_unselected[0]);
+    let green_color = palette_match!(palette.text_unselected[1]);
+    let orange_color = palette_match!(palette.text_unselected[2]);
     let shortcut_left_separator = Style::new().fg(text_color).bold().paint(" (");
     let shortcut_right_separator = Style::new().fg(text_color).bold().paint("): ");
     let fullscreen = "FULLSCREEN";
@@ -472,13 +463,10 @@ pub fn floating_panes_are_visible(mode_info: &ModeInfo) -> LinePart {
     }
 }
 
-pub fn locked_fullscreen_panes_to_hide(palette: &Palette, panes_to_hide: usize) -> LinePart {
-    let text_color = palette_match!(match palette.theme_hue {
-        ThemeHue::Dark => palette.white,
-        ThemeHue::Light => palette.black,
-    });
-    let green_color = palette_match!(palette.green);
-    let orange_color = palette_match!(palette.orange);
+pub fn locked_fullscreen_panes_to_hide(palette: &Styling, panes_to_hide: usize) -> LinePart {
+    let text_color = palette_match!(palette.text_unselected[0]);
+    let green_color = palette_match!(palette.text_unselected[1]);
+    let orange_color = palette_match!(palette.text_unselected[2]);
     let locked_text = " -- INTERFACE LOCKED -- ";
     let shortcut_left_separator = Style::new().fg(text_color).bold().paint(" (");
     let shortcut_right_separator = Style::new().fg(text_color).bold().paint("): ");
@@ -507,15 +495,9 @@ pub fn locked_fullscreen_panes_to_hide(palette: &Palette, panes_to_hide: usize) 
     }
 }
 
-pub fn locked_floating_panes_are_visible(palette: &Palette) -> LinePart {
-    let white_color = match palette.white {
-        PaletteColor::Rgb((r, g, b)) => RGB(r, g, b),
-        PaletteColor::EightBit(color) => Fixed(color),
-    };
-    let orange_color = match palette.orange {
-        PaletteColor::Rgb((r, g, b)) => RGB(r, g, b),
-        PaletteColor::EightBit(color) => Fixed(color),
-    };
+pub fn locked_floating_panes_are_visible(palette: &Styling) -> LinePart {
+    let white_color = palette_match!(palette.text_unselected[0]);
+    let orange_color = palette_match!(palette.text_unselected[1]);
     let shortcut_left_separator = Style::new().fg(white_color).bold().paint(" (");
     let shortcut_right_separator = Style::new().fg(white_color).bold().paint(")");
     let locked_text = " -- INTERFACE LOCKED -- ";
@@ -561,7 +543,7 @@ mod tests {
     #[test]
     fn full_length_shortcut_with_key() {
         let keyvec = vec![Key::Char('a')];
-        let palette = get_palette();
+        let palette = Styling::default();
 
         let ret = full_length_shortcut(false, keyvec, "Foobar", palette);
         let ret = unstyle(ret);
@@ -572,7 +554,7 @@ mod tests {
     #[test]
     fn full_length_shortcut_with_key_first_element() {
         let keyvec = vec![Key::Char('a')];
-        let palette = get_palette();
+        let palette = Styling::default();
 
         let ret = full_length_shortcut(true, keyvec, "Foobar", palette);
         let ret = unstyle(ret);
@@ -584,7 +566,7 @@ mod tests {
     // When there is no binding, we print no shortcut either
     fn full_length_shortcut_without_key() {
         let keyvec = vec![];
-        let palette = get_palette();
+        let palette = Styling::default();
 
         let ret = full_length_shortcut(false, keyvec, "Foobar", palette);
         let ret = unstyle(ret);
@@ -595,7 +577,7 @@ mod tests {
     #[test]
     fn full_length_shortcut_with_key_unprintable_1() {
         let keyvec = vec![Key::Char('\n')];
-        let palette = get_palette();
+        let palette = Styling::default();
 
         let ret = full_length_shortcut(false, keyvec, "Foobar", palette);
         let ret = unstyle(ret);
@@ -606,7 +588,7 @@ mod tests {
     #[test]
     fn full_length_shortcut_with_key_unprintable_2() {
         let keyvec = vec![Key::Backspace];
-        let palette = get_palette();
+        let palette = Styling::default();
 
         let ret = full_length_shortcut(false, keyvec, "Foobar", palette);
         let ret = unstyle(ret);
@@ -617,7 +599,7 @@ mod tests {
     #[test]
     fn full_length_shortcut_with_ctrl_key() {
         let keyvec = vec![Key::Ctrl('a')];
-        let palette = get_palette();
+        let palette = Styling::default();
 
         let ret = full_length_shortcut(false, keyvec, "Foobar", palette);
         let ret = unstyle(ret);
@@ -628,7 +610,7 @@ mod tests {
     #[test]
     fn full_length_shortcut_with_alt_key() {
         let keyvec = vec![Key::Alt(CharOrArrow::Char('a'))];
-        let palette = get_palette();
+        let palette = Styling::default();
 
         let ret = full_length_shortcut(false, keyvec, "Foobar", palette);
         let ret = unstyle(ret);
@@ -639,7 +621,7 @@ mod tests {
     #[test]
     fn full_length_shortcut_with_homogenous_key_group() {
         let keyvec = vec![Key::Char('a'), Key::Char('b'), Key::Char('c')];
-        let palette = get_palette();
+        let palette = Styling::default();
 
         let ret = full_length_shortcut(false, keyvec, "Foobar", palette);
         let ret = unstyle(ret);
@@ -650,7 +632,7 @@ mod tests {
     #[test]
     fn full_length_shortcut_with_heterogenous_key_group() {
         let keyvec = vec![Key::Char('a'), Key::Ctrl('b'), Key::Char('\n')];
-        let palette = get_palette();
+        let palette = Styling::default();
 
         let ret = full_length_shortcut(false, keyvec, "Foobar", palette);
         let ret = unstyle(ret);
@@ -661,7 +643,7 @@ mod tests {
     #[test]
     fn full_length_shortcut_with_key_group_shared_ctrl_modifier() {
         let keyvec = vec![Key::Ctrl('a'), Key::Ctrl('b'), Key::Ctrl('c')];
-        let palette = get_palette();
+        let palette = Styling::default();
 
         let ret = full_length_shortcut(false, keyvec, "Foobar", palette);
         let ret = unstyle(ret);
