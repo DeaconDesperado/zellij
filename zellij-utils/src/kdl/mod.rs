@@ -1969,7 +1969,7 @@ impl UiConfig {
 }
 
 impl Themes {
-    fn color_from_node(
+    fn colors_with_bg_from_node(
         style_node: &KdlNode,
         style_descriptor: &str,
     ) -> Result<[PaletteColor; 6], ConfigError> {
@@ -1979,16 +1979,15 @@ impl Themes {
         );
         Ok([
             PaletteColor::try_from(("base", colors))?,
-            PaletteColor::try_from(("emp1", colors))?,
-            PaletteColor::try_from(("emp2", colors))?,
-            PaletteColor::try_from(("emp3", colors))?,
-            PaletteColor::try_from(("emp4", colors))?,
-            PaletteColor::try_from(("bg", colors))?,
+            PaletteColor::try_from(("emphasis_1", colors))?,
+            PaletteColor::try_from(("emphasis_2", colors))?,
+            PaletteColor::try_from(("emphasis_3", colors))?,
+            PaletteColor::try_from(("emphasis_4", colors))?,
+            PaletteColor::try_from(("background", colors))?,
         ])
     }
 
-    // TODO: const generics etc?
-    fn color_from_node_2(
+    fn colors_from_node(
         style_node: &KdlNode,
         style_descriptor: &str,
     ) -> Result<[PaletteColor; 5], ConfigError> {
@@ -1998,10 +1997,10 @@ impl Themes {
         );
         Ok([
             PaletteColor::try_from(("base", colors))?,
-            PaletteColor::try_from(("emp1", colors))?,
-            PaletteColor::try_from(("emp2", colors))?,
-            PaletteColor::try_from(("emp3", colors))?,
-            PaletteColor::try_from(("emp4", colors))?,
+            PaletteColor::try_from(("emphasis_1", colors))?,
+            PaletteColor::try_from(("emphasis_2", colors))?,
+            PaletteColor::try_from(("emphasis_3", colors))?,
+            PaletteColor::try_from(("emphasis_4", colors))?,
         ])
     }
 
@@ -2015,22 +2014,37 @@ impl Themes {
                 // Newer theme definition with named styles
                 Some(style) => {
                     let s = Styling {
-                        text_unselected: Themes::color_from_node(style, "text_unselected")?,
-                        text_selected: Themes::color_from_node(style, "text_selected")?,
-                        ribbon_unselected: Themes::color_from_node(style, "ribbon_unselected")?,
-                        ribbon_selected: Themes::color_from_node(style, "ribbon_selected")?,
-                        table_title: Themes::color_from_node(style, "table_title")?,
-                        table_cell_unselected: Themes::color_from_node(
+                        text_unselected: Themes::colors_with_bg_from_node(
+                            style,
+                            "text_unselected",
+                        )?,
+                        text_selected: Themes::colors_with_bg_from_node(style, "text_selected")?,
+                        ribbon_unselected: Themes::colors_with_bg_from_node(
+                            style,
+                            "ribbon_unselected",
+                        )?,
+                        ribbon_selected: Themes::colors_with_bg_from_node(
+                            style,
+                            "ribbon_selected",
+                        )?,
+                        table_title: Themes::colors_with_bg_from_node(style, "table_title")?,
+                        table_cell_unselected: Themes::colors_with_bg_from_node(
                             style,
                             "table_cell_unselected",
                         )?,
-                        table_cell_selected: Themes::color_from_node(style, "table_cell_selected")?,
-                        list_unselected: Themes::color_from_node(style, "list_unselected")?,
-                        list_selected: Themes::color_from_node(style, "list_selected")?,
-                        frame_unselected: Themes::color_from_node_2(style, "frame_unselected")?,
-                        frame_selected: Themes::color_from_node_2(style, "frame_selected")?,
-                        exit_code_success: Themes::color_from_node_2(style, "exit_code_success")?,
-                        exit_code_error: Themes::color_from_node_2(style, "exit_code_error")?,
+                        table_cell_selected: Themes::colors_with_bg_from_node(
+                            style,
+                            "table_cell_selected",
+                        )?,
+                        list_unselected: Themes::colors_with_bg_from_node(
+                            style,
+                            "list_unselected",
+                        )?,
+                        list_selected: Themes::colors_with_bg_from_node(style, "list_selected")?,
+                        frame_unselected: Themes::colors_from_node(style, "frame_unselected")?,
+                        frame_selected: Themes::colors_from_node(style, "frame_selected")?,
+                        exit_code_success: Themes::colors_from_node(style, "exit_code_success")?,
+                        exit_code_error: Themes::colors_from_node(style, "exit_code_error")?,
                     };
 
                     Theme {
