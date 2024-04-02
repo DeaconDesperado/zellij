@@ -1,7 +1,7 @@
 use crate::input::actions::Action;
 use crate::input::config::ConversionError;
 use crate::input::layout::SplitSize;
-use crate::shared::default_palette;
+use crate::shared::{colors as default_colors, default_palette};
 use clap::ArgEnum;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap, HashSet};
@@ -14,34 +14,24 @@ use strum_macros::{Display, EnumDiscriminants, EnumIter, EnumString, ToString};
 
 pub type ClientId = u16; // TODO: merge with crate type?
 
-pub fn client_id_to_colors(
-    client_id: ClientId,
-    colors: Styling,
-) -> Option<(PaletteColor, PaletteColor)> {
+pub fn client_id_to_colors(client_id: ClientId) -> Option<(PaletteColor, PaletteColor)> {
     // (primary color, secondary color)
-    // TODO: mapping of client colors
+    // TODO: revisit client_id coloration
+    let black = PaletteColor::EightBit(default_colors::BLACK);
     match client_id {
-        _ => Some((colors.text_unselected[0], colors.text_unselected[5])),
-        /*
-        1 => Some((colors.magenta, colors.black)),
-        2 => Some((colors.blue, colors.black)),
-        3 => Some((colors.purple, colors.black)),
-        4 => Some((colors.yellow, colors.black)),
-        5 => Some((colors.cyan, colors.black)),
-        6 => Some((colors.gold, colors.black)),
-        7 => Some((colors.red, colors.black)),
-        8 => Some((colors.silver, colors.black)),
-        9 => Some((colors.pink, colors.black)),
-        10 => Some((colors.brown, colors.black)),
+        1 => Some((PaletteColor::EightBit(default_colors::MAGENTA), black)),
+        2 => Some((PaletteColor::EightBit(default_colors::BLUE), black)),
+        3 => Some((PaletteColor::EightBit(default_colors::PURPLE), black)),
+        4 => Some((PaletteColor::EightBit(default_colors::YELLOW), black)),
+        5 => Some((PaletteColor::EightBit(default_colors::CYAN), black)),
+        6 => Some((PaletteColor::EightBit(default_colors::GOLD), black)),
+        7 => Some((PaletteColor::EightBit(default_colors::RED), black)),
+        8 => Some((PaletteColor::EightBit(default_colors::SILVER), black)),
+        9 => Some((PaletteColor::EightBit(default_colors::PINK), black)),
+        10 => Some((PaletteColor::EightBit(default_colors::BROWN), black)),
         _ => None,
-        */
     }
 }
-
-pub fn single_client_color(colors: Palette) -> (PaletteColor, PaletteColor) {
-    (colors.green, colors.black)
-}
-
 // TODO: Add a shortened string representation (beyond `Display::fmt` below) that can be used when
 // screen space is scarce. Useful for e.g. "ENTER", "SPACE", "TAB" to display as Unicode
 // representations instead.
@@ -803,7 +793,6 @@ impl From<Palette> for Styling {
                 palette.magenta,
                 palette.bg,
             ],
-            // TODO: update
             text_selected: [
                 palette.white,
                 palette.orange,
@@ -827,6 +816,20 @@ impl From<Palette> for Styling {
                 palette.blue,
                 palette.magenta,
                 palette.green,
+            ],
+            exit_code_success: [
+                palette.green,
+                palette.cyan,
+                palette.black,
+                palette.magenta,
+                palette.blue,
+            ],
+            exit_code_error: [
+                palette.red,
+                palette.yellow,
+                palette.gold,
+                palette.silver,
+                palette.purple,
             ],
             ..Default::default() /*
                                  table_title: (),
