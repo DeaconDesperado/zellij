@@ -1145,7 +1145,7 @@ impl From<Palette> for Styling {
                 palette.cyan,
                 palette.green,
                 palette.magenta,
-                palette.bg,
+                palette.black,
             ],
             text_selected: [
                 palette.white,
@@ -1184,6 +1184,20 @@ impl From<Palette> for Styling {
                 palette.gold,
                 palette.silver,
                 palette.purple,
+            ],
+            frame_unselected: [
+                palette.orange,
+                palette.pink,
+                palette.gray,
+                palette.brown,
+                palette.black,
+            ],
+            frame_selected: [
+                palette.green,
+                palette.orange,
+                palette.cyan,
+                palette.magenta,
+                palette.brown,
             ],
             ..Default::default() /*
                                  table_title: (),
