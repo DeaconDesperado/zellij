@@ -2069,7 +2069,6 @@ impl Themes {
                     };
                     Theme {
                         palette,
-                        // TODO: inverse palette -> styling
                         styling: palette.into(),
                     }
                 },
