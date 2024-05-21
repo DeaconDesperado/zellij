@@ -4,7 +4,7 @@ use crate::input::layout::SplitSize;
 use crate::shared::colors as default_colors;
 use clap::ArgEnum;
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::fmt;
 use std::fs::Metadata;
 use std::path::{Path, PathBuf};
