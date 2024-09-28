@@ -877,6 +877,7 @@ mod config_test {
         expected_themes.insert(
             "named_theme".into(),
             Theme {
+                sourced_from_external_file: false,
                 palette: Styling {
                     text_unselected: StyleDeclaration {
                         base: PaletteColor::Rgb((220, 215, 186)),
@@ -1046,6 +1047,7 @@ mod config_test {
         expected_themes.insert(
             "named_theme".into(),
             Theme {
+                sourced_from_external_file: false,
                 palette: Styling {
                     text_unselected: StyleDeclaration {
                         base: PaletteColor::Rgb((220, 215, 186)),
