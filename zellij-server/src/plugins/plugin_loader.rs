@@ -559,6 +559,10 @@ impl<'a> PluginLoader<'a> {
             self.plugin_id
         );
         let (wasm_bytes, cached_path) = self.plugin_bytes_and_cache_path()?;
+        log::info!(
+            "attempting to read plugin bytes from {}",
+            cached_path.to_str().unwrap()
+        );
         let timer = std::time::Instant::now();
         let err_context = || "failed to recover cache dir";
         let module = fs::create_dir_all(ZELLIJ_PLUGIN_ARTIFACT_DIR.as_path())
