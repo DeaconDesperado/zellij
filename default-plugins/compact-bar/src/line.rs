@@ -229,6 +229,7 @@ fn tab_line_prefix(
             tab_index: None,
         })
     }
+
     parts
 }
 

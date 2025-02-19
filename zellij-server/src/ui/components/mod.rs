@@ -10,7 +10,7 @@ use zellij_utils::{data::Style, lazy_static::lazy_static, regex::Regex, vte};
 
 use component_coordinates::{is_too_high, is_too_wide, Coordinates};
 use nested_list::{nested_list, parse_nested_list_items};
-use ribbon::ribbon;
+use ribbon::{parse_ribbon_index, ribbon};
 use table::table;
 use text::{parse_text, parse_text_params, stringify_text, text, Text};
 
@@ -93,6 +93,7 @@ impl<'a> UiComponentParser<'a> {
             parse_vte_bytes!(self, encoded_table);
             Ok(())
         } else if component_name == &"ribbon" {
+            let ribbon_index = parse_ribbon_index(&mut params_iter);
             let stringified_params = parse_text_params(params_iter)
                 .into_iter()
                 .next()
@@ -102,6 +103,7 @@ impl<'a> UiComponentParser<'a> {
                 &self.style,
                 self.arrow_fonts,
                 component_coordinates,
+                ribbon_index,
             );
             parse_vte_bytes!(self, encoded_text);
             Ok(())
