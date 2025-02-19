@@ -48,6 +48,10 @@ pub fn serialize_ribbon_with_coordinates(
     )
 }
 
+fn serialize_ribbon_with_index(text: &Text, index: usize) -> String {
+    format!("\u{1b}Pzribbon;|{}|;{}\u{1b}\\", index, text.serialize())
+}
+
 pub fn serialize_ribbon_line<I>(ribbons: I) -> String
 where
     I: IntoIterator,
@@ -55,7 +59,8 @@ where
 {
     ribbons
         .into_iter()
-        .map(|r| serialize_ribbon(r.borrow()))
+        .enumerate()
+        .map(|(i, r)| serialize_ribbon_with_index(r.borrow(), i))
         .collect()
 }
 

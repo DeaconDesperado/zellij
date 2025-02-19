@@ -20,65 +20,41 @@ fn cursors(focused_clients: &[ClientId], colors: MultiplayerColors) -> (Vec<ANSI
 pub fn render_tab(
     text: String,
     tab: &TabInfo,
-    is_alternate_tab: bool,
+    _is_alternate_tab: bool,
     palette: Styling,
     separator: &str,
 ) -> LinePart {
     let focused_clients = tab.other_focused_clients.as_slice();
     let separator_width = separator.width();
-    let alternate_tab_color = if is_alternate_tab {
-        palette.ribbon_unselected.emphasis_1
-    } else {
-        palette.ribbon_unselected.background
-    };
-    let background_color = if tab.active {
-        palette.ribbon_selected.background
-    } else if is_alternate_tab {
-        alternate_tab_color
-    } else {
-        palette.ribbon_unselected.background
-    };
-    let foreground_color = if tab.active {
-        palette.ribbon_selected.base
-    } else {
-        palette.ribbon_unselected.base
-    };
-    let separator_fill_color = palette.text_unselected.background;
-    let left_separator = style!(separator_fill_color, background_color).paint(separator);
     let mut tab_text_len = text.width() + (separator_width * 2) + 2; // + 2 for padding
 
-    let tab_styled_text = style!(foreground_color, background_color)
-        .bold()
-        .paint(format!(" {} ", text));
-
-    let right_separator = style!(background_color, separator_fill_color).paint(separator);
     let tab_styled_text = if !focused_clients.is_empty() {
         let (cursor_section, extra_length) =
             cursors(focused_clients, palette.multiplayer_user_colors);
         tab_text_len += extra_length;
         let mut s = String::new();
-        let cursor_beginning = style!(foreground_color, background_color)
-            .bold()
-            .paint("[")
-            .to_string();
+        let cursor_beginning = "[";
         let cursor_section = ANSIStrings(&cursor_section).to_string();
-        let cursor_end = style!(foreground_color, background_color)
-            .bold()
-            .paint("]")
-            .to_string();
-        s.push_str(&left_separator.to_string());
-        s.push_str(&tab_styled_text.to_string());
+        let cursor_end = "]";
+        s.push_str(&text.to_string());
         s.push_str(&cursor_beginning);
         s.push_str(&cursor_section);
         s.push_str(&cursor_end);
-        s.push_str(&right_separator.to_string());
-        s
+        Text::new(s)
     } else {
-        ANSIStrings(&[left_separator, tab_styled_text, right_separator]).to_string()
+        Text::new(text)
     };
 
+    let tab_styled_text = if tab.active {
+        tab_styled_text.selected()
+    } else {
+        tab_styled_text
+    };
+
+    let ribbon = serialize_ribbon(&tab_styled_text);
+
     LinePart {
-        part: tab_styled_text,
+        part: ribbon,
         len: tab_text_len,
         tab_index: Some(tab.position),
     }
