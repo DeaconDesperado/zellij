@@ -1,7 +1,7 @@
-use ansi_term::ANSIStrings;
+use ansi_term::Style;
 use unicode_width::UnicodeWidthStr;
 
-use crate::{LinePart, ARROW_SEPARATOR};
+use crate::{LinePart, LinePartElement, ARROW_SEPARATOR};
 use zellij_tile::prelude::*;
 use zellij_tile_utils::style;
 
@@ -16,7 +16,6 @@ fn populate_tabs_in_tab_line(
     tabs_after_active: &mut Vec<LinePart>,
     tabs_to_render: &mut Vec<LinePart>,
     cols: usize,
-    palette: Styling,
     capabilities: PluginCapabilities,
 ) {
     let mut middle_size = get_current_title_len(tabs_to_render);
@@ -29,17 +28,12 @@ fn populate_tabs_in_tab_line(
 
         // left_more_tab_index is the tab to the left of the leftmost visible tab
         let left_more_tab_index = left_count.saturating_sub(1);
-        let collapsed_left = left_more_message(
-            left_count,
-            palette,
-            tab_separator(capabilities),
-            left_more_tab_index,
-        );
+        let collapsed_left =
+            left_more_message(left_count, tab_separator(capabilities), left_more_tab_index);
         // right_more_tab_index is the tab to the right of the rightmost visible tab
         let right_more_tab_index = left_count + tabs_to_render.len();
         let collapsed_right = right_more_message(
             right_count,
-            palette,
             tab_separator(capabilities),
             right_more_tab_index,
         );
@@ -105,12 +99,7 @@ fn populate_tabs_in_tab_line(
     }
 }
 
-fn left_more_message(
-    tab_count_to_the_left: usize,
-    palette: Styling,
-    separator: &str,
-    tab_index: usize,
-) -> LinePart {
+fn left_more_message(tab_count_to_the_left: usize, separator: &str, tab_index: usize) -> LinePart {
     if tab_count_to_the_left == 0 {
         return LinePart::default();
     }
@@ -122,26 +111,16 @@ fn left_more_message(
     // 238
     // chars length plus separator length on both sides
     let more_text_len = more_text.width() + 2 * separator.width();
-    let (text_color, sep_color) = (
-        palette.ribbon_unselected.base,
-        palette.text_unselected.background,
-    );
-    let plus_ribbon_bg = palette.text_selected.emphasis_0;
-    let left_separator = style!(sep_color, plus_ribbon_bg).paint(separator);
-    let more_styled_text = style!(text_color, plus_ribbon_bg).bold().paint(more_text);
-    let right_separator = style!(plus_ribbon_bg, sep_color).paint(separator);
-    let more_styled_text =
-        ANSIStrings(&[left_separator, more_styled_text, right_separator]).to_string();
     LinePart {
-        part: more_styled_text,
+        part: Text::new(more_text).color_range(1, 0..),
         len: more_text_len,
         tab_index: Some(tab_index),
+        element: LinePartElement::MoreMarker,
     }
 }
 
 fn right_more_message(
     tab_count_to_the_right: usize,
-    palette: Styling,
     separator: &str,
     tab_index: usize,
 ) -> LinePart {
@@ -156,53 +135,34 @@ fn right_more_message(
     // chars length plus separator length on both sides
     let more_text_len = more_text.width() + 2 * separator.width();
 
-    let (text_color, sep_color) = (
-        palette.ribbon_unselected.base,
-        palette.text_unselected.background,
-    );
-    let plus_ribbon_bg = palette.text_selected.emphasis_0;
-    let left_separator = style!(sep_color, plus_ribbon_bg).paint(separator);
-    let more_styled_text = style!(text_color, plus_ribbon_bg).bold().paint(more_text);
-    let right_separator = style!(plus_ribbon_bg, sep_color).paint(separator);
-    let more_styled_text =
-        ANSIStrings(&[left_separator, more_styled_text, right_separator]).to_string();
     LinePart {
-        part: more_styled_text,
+        part: Text::new(more_text).color_range(1, 0..),
         len: more_text_len,
         tab_index: Some(tab_index),
+        element: LinePartElement::MoreMarker,
     }
 }
 
-fn tab_line_prefix(
-    session_name: Option<&str>,
-    mode: InputMode,
-    palette: Styling,
-    cols: usize,
-) -> Vec<LinePart> {
+fn tab_line_prefix(session_name: Option<&str>, mode: InputMode, cols: usize) -> Vec<LinePart> {
     let prefix_text = " Zellij ".to_string();
 
     let prefix_text_len = prefix_text.chars().count();
-    let text_color = palette.text_unselected.base;
-    let bg_color = palette.text_unselected.background;
-    let locked_mode_color = palette.text_unselected.emphasis_3;
-    let normal_mode_color = palette.text_unselected.emphasis_2;
-    let other_modes_color = palette.text_unselected.emphasis_0;
 
-    let prefix_styled_text = style!(text_color, bg_color).bold().paint(prefix_text);
     let mut parts = vec![LinePart {
-        part: prefix_styled_text.to_string(),
+        part: Text::new(prefix_text),
         len: prefix_text_len,
         tab_index: None,
+        element: LinePartElement::Prefix,
     }];
     if let Some(name) = session_name {
         let name_part = format!("({})", name);
         let name_part_len = name_part.width();
-        let name_part_styled_text = style!(text_color, bg_color).bold().paint(name_part);
         if cols.saturating_sub(prefix_text_len) >= name_part_len {
             parts.push(LinePart {
-                part: name_part_styled_text.to_string(),
+                part: Text::new(name_part),
                 len: name_part_len,
                 tab_index: None,
+                element: LinePartElement::Prefix,
             })
         }
     }
@@ -210,23 +170,18 @@ fn tab_line_prefix(
     let mode_part_padded = format!(" {} ", mode_part);
     let mode_part_len = mode_part_padded.width();
     let mode_part_styled_text = if mode == InputMode::Locked {
-        style!(locked_mode_color, bg_color)
-            .bold()
-            .paint(mode_part_padded)
+        Text::new(mode_part_padded).color_range(3, 0..)
     } else if mode == InputMode::Normal {
-        style!(normal_mode_color, bg_color)
-            .bold()
-            .paint(mode_part_padded)
+        Text::new(mode_part_padded).color_range(2, 0..)
     } else {
-        style!(other_modes_color, bg_color)
-            .bold()
-            .paint(mode_part_padded)
+        Text::new(mode_part_padded).color_range(0, 0..)
     };
     if cols.saturating_sub(prefix_text_len) >= mode_part_len {
         parts.push(LinePart {
-            part: format!("{}", mode_part_styled_text),
+            part: mode_part_styled_text,
             len: mode_part_len,
             tab_index: None,
+            element: LinePartElement::Prefix,
         })
     }
 
@@ -246,7 +201,6 @@ pub fn tab_line(
     mut all_tabs: Vec<LinePart>,
     active_tab_index: usize,
     cols: usize,
-    palette: Styling,
     capabilities: PluginCapabilities,
     hide_session_name: bool,
     mode: InputMode,
@@ -261,8 +215,8 @@ pub fn tab_line(
         tabs_before_active.pop().unwrap()
     };
     let mut prefix = match hide_session_name {
-        true => tab_line_prefix(None, mode, palette, cols),
-        false => tab_line_prefix(session_name, mode, palette, cols),
+        true => tab_line_prefix(None, mode, cols),
+        false => tab_line_prefix(session_name, mode, cols),
     };
     let prefix_len = get_current_title_len(&prefix);
 
@@ -278,7 +232,6 @@ pub fn tab_line(
         &mut tabs_after_active,
         &mut tabs_to_render,
         cols.saturating_sub(prefix_len),
-        palette,
         capabilities,
     );
     prefix.append(&mut tabs_to_render);
@@ -286,24 +239,22 @@ pub fn tab_line(
     let current_title_len = get_current_title_len(&prefix);
     if current_title_len < cols {
         let mut remaining_space = cols - current_title_len;
-        let remaining_bg = palette.text_unselected.background;
         if let Some(swap_layout_status) = swap_layout_status(
             remaining_space,
             active_swap_layout_name,
             is_swap_layout_dirty,
             mode,
-            &palette,
-            tab_separator(capabilities),
         ) {
             remaining_space -= swap_layout_status.len;
             let mut buffer = String::new();
             for _ in 0..remaining_space {
-                buffer.push_str(&style!(remaining_bg, remaining_bg).paint(" ").to_string());
+                buffer.push_str(" ");
             }
             prefix.push(LinePart {
-                part: buffer,
+                part: Text::new(buffer),
                 len: remaining_space,
                 tab_index: None,
+                element: LinePartElement::Padding,
             });
             prefix.push(swap_layout_status);
         }
@@ -317,55 +268,38 @@ fn swap_layout_status(
     swap_layout_name: &Option<String>,
     is_swap_layout_damaged: bool,
     input_mode: InputMode,
-    palette: &Styling,
-    separator: &str,
 ) -> Option<LinePart> {
     match swap_layout_name {
         Some(swap_layout_name) => {
             let mut swap_layout_name = format!(" {} ", swap_layout_name);
             swap_layout_name.make_ascii_uppercase();
-            let swap_layout_name_len = swap_layout_name.len() + 3;
-            let bg = palette.text_unselected.background;
-            let fg = palette.ribbon_unselected.background;
-            let green = palette.ribbon_selected.background;
-
-            let (prefix_separator, swap_layout_name, suffix_separator) =
-                if input_mode == InputMode::Locked {
-                    (
-                        style!(bg, fg).paint(separator),
-                        style!(bg, fg).italic().paint(&swap_layout_name),
-                        style!(fg, bg).paint(separator),
-                    )
-                } else if is_swap_layout_damaged {
-                    (
-                        style!(bg, fg).paint(separator),
-                        style!(bg, fg).bold().paint(&swap_layout_name),
-                        style!(fg, bg).paint(separator),
-                    )
-                } else {
-                    (
-                        style!(bg, green).paint(separator),
-                        style!(bg, green).bold().paint(&swap_layout_name),
-                        style!(green, bg).paint(separator),
-                    )
-                };
-            let swap_layout_indicator = format!(
-                "{}{}{}",
-                prefix_separator, swap_layout_name, suffix_separator
-            );
-            let (part, full_len) = (format!("{}", swap_layout_indicator), swap_layout_name_len);
+            let swap_layout_name_len = swap_layout_name.len();
+            let full_len = swap_layout_name_len + 3;
             let short_len = swap_layout_name_len + 1; // 1 is the space between
+
+            let swap_layout_name = if input_mode == InputMode::Locked {
+                // italic
+                Text::new(&swap_layout_name).opaque()
+            } else if is_swap_layout_damaged {
+                // bold
+                Text::new(&swap_layout_name).opaque()
+            } else {
+                // selected, ribbon background hilight
+                Text::new(&swap_layout_name).opaque().selected()
+            };
             if full_len <= max_len {
                 Some(LinePart {
-                    part,
+                    part: swap_layout_name,
                     len: full_len,
                     tab_index: None,
+                    element: LinePartElement::SwapLayoutStatus,
                 })
             } else if short_len <= max_len && input_mode != InputMode::Locked {
                 Some(LinePart {
-                    part: swap_layout_indicator,
+                    part: swap_layout_name,
                     len: short_len,
                     tab_index: None,
+                    element: LinePartElement::SwapLayoutStatus,
                 })
             } else {
                 None

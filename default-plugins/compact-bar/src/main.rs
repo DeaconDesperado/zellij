@@ -11,11 +11,28 @@ use zellij_tile::prelude::*;
 use crate::line::tab_line;
 use crate::tab::tab_style;
 
+#[derive(Debug)]
+pub enum LinePartElement {
+    Empty,
+    Prefix,
+    RibbonTabs,
+    MoreMarker,
+    Padding,
+    SwapLayoutStatus,
+}
+
+impl Default for LinePartElement {
+    fn default() -> Self {
+        LinePartElement::Empty
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct LinePart {
-    part: String,
+    part: Text,
     len: usize,
     tab_index: Option<usize>,
+    element: LinePartElement,
 }
 
 #[derive(Default)]
@@ -108,7 +125,6 @@ impl ZellijPlugin for State {
             let tab = tab_style(
                 tabname,
                 t,
-                is_alternate_tab,
                 self.mode_info.style.colors,
                 self.mode_info.capabilities,
             );
@@ -120,25 +136,23 @@ impl ZellijPlugin for State {
             all_tabs,
             active_tab_index,
             cols.saturating_sub(1),
-            self.mode_info.style.colors,
             self.mode_info.capabilities,
             self.mode_info.style.hide_session_name,
             self.mode_info.mode,
             &active_swap_layout_name,
             is_swap_layout_dirty,
         );
-        let output = self
-            .tab_line
-            .iter()
-            .fold(String::new(), |output, part| output + &part.part);
-        let background = self.mode_info.style.colors.text_unselected.background;
-        match background {
-            PaletteColor::Rgb((r, g, b)) => {
-                print!("{}\u{1b}[48;2;{};{};{}m\u{1b}[0K", output, r, g, b);
-            },
-            PaletteColor::EightBit(color) => {
-                print!("{}\u{1b}[48;5;{}m\u{1b}[0K", output, color);
-            },
-        }
+        let output = self.tab_line.iter().fold(String::new(), |output, part| {
+            let elem = match part.element {
+                LinePartElement::Empty => "".to_string(),
+                LinePartElement::Prefix => serialize_text(&part.part),
+                LinePartElement::SwapLayoutStatus => serialize_ribbon(&part.part),
+                LinePartElement::RibbonTabs => serialize_ribbon(&part.part),
+                LinePartElement::MoreMarker => serialize_ribbon(&part.part),
+                LinePartElement::Padding => serialize_text(&part.part),
+            };
+            output + &elem
+        });
+        print!("{}", output)
     }
 }
