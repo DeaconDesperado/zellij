@@ -1,4 +1,4 @@
-use crate::{line::tab_separator, LinePart};
+use crate::{line::tab_separator, LinePart, LinePartElement};
 use ansi_term::{ANSIString, ANSIStrings};
 use unicode_width::UnicodeWidthStr;
 use zellij_tile::prelude::*;
@@ -17,13 +17,7 @@ fn cursors(focused_clients: &[ClientId], colors: MultiplayerColors) -> (Vec<ANSI
     (cursors, len)
 }
 
-pub fn render_tab(
-    text: String,
-    tab: &TabInfo,
-    _is_alternate_tab: bool,
-    palette: Styling,
-    separator: &str,
-) -> LinePart {
+pub fn render_tab(text: String, tab: &TabInfo, palette: Styling, separator: &str) -> LinePart {
     let focused_clients = tab.other_focused_clients.as_slice();
     let separator_width = separator.width();
     let mut tab_text_len = text.width() + (separator_width * 2) + 2; // + 2 for padding
@@ -51,19 +45,17 @@ pub fn render_tab(
         tab_styled_text
     };
 
-    let ribbon = serialize_ribbon(&tab_styled_text);
-
     LinePart {
-        part: ribbon,
+        part: tab_styled_text,
         len: tab_text_len,
         tab_index: Some(tab.position),
+        element: LinePartElement::RibbonTabs,
     }
 }
 
 pub fn tab_style(
     mut tabname: String,
     tab: &TabInfo,
-    mut is_alternate_tab: bool,
     palette: Styling,
     capabilities: PluginCapabilities,
 ) -> LinePart {
@@ -74,12 +66,8 @@ pub fn tab_style(
     } else if tab.is_sync_panes_active {
         tabname.push_str(" (SYNC)");
     }
-    // we only color alternate tabs differently if we can't use the arrow fonts to separate them
-    if !capabilities.arrow_fonts {
-        is_alternate_tab = false;
-    }
 
-    render_tab(tabname, tab, is_alternate_tab, palette, separator)
+    render_tab(tabname, tab, palette, separator)
 }
 
 pub(crate) fn get_tab_to_focus(
