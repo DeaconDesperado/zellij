@@ -1,9 +1,7 @@
-use ansi_term::Style;
 use unicode_width::UnicodeWidthStr;
 
 use crate::{LinePart, LinePartElement, ARROW_SEPARATOR};
 use zellij_tile::prelude::*;
-use zellij_tile_utils::style;
 
 fn get_current_title_len(current_title: &[LinePart]) -> usize {
     current_title.iter().map(|p| p.len).sum()
