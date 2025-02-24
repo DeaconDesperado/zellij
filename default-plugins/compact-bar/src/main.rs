@@ -1,5 +1,6 @@
 mod line;
 mod tab;
+use unicode_width::UnicodeWidthStr;
 
 use std::cmp::{max, min};
 use std::collections::BTreeMap;
