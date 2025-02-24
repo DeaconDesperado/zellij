@@ -40,7 +40,7 @@ fn populate_tabs_in_tab_line(
 
         let total_size = collapsed_left.len + middle_size + collapsed_right.len;
 
-        if total_size > cols {
+        if total_size >= cols {
             // break and dont add collapsed tabs to tabs_to_render, they will not fit
             break;
         }
@@ -74,8 +74,8 @@ fn populate_tabs_in_tab_line(
                     0
                 });
 
-        let left_fits = size_by_adding_left <= cols;
-        let right_fits = size_by_adding_right <= cols;
+        let left_fits = size_by_adding_left < cols;
+        let right_fits = size_by_adding_right < cols;
         // active tab is kept in the middle by adding to the side that
         // has less width, or if the tab on the other side doesn't fit
         if (total_left <= total_right || !right_fits) && left_fits {
@@ -104,13 +104,13 @@ fn left_more_message(tab_count_to_the_left: usize, separator: &str, tab_index: u
         return LinePart::default();
     }
     let more_text = if tab_count_to_the_left < 10000 {
-        format!(" ← +{} ", tab_count_to_the_left)
+        format!("← +{}", tab_count_to_the_left)
     } else {
-        " ← +many ".to_string()
+        "← +many".to_string()
     };
     // 238
     // chars length plus separator length on both sides
-    let more_text_len = more_text.width() + 2 * separator.width();
+    let more_text_len = more_text.width() + 2 * separator.width() + 1;
     LinePart {
         part: Text::new(more_text).color_range(1, 0..),
         len: more_text_len,
@@ -128,12 +128,12 @@ fn right_more_message(
         return LinePart::default();
     };
     let more_text = if tab_count_to_the_right < 10000 {
-        format!(" +{} → ", tab_count_to_the_right)
+        format!("+{} →", tab_count_to_the_right)
     } else {
-        " +many → ".to_string()
+        "+many →".to_string()
     };
     // chars length plus separator length on both sides
-    let more_text_len = more_text.width() + 2 * separator.width();
+    let more_text_len = more_text.width() + 2 * separator.width() + 1;
 
     LinePart {
         part: Text::new(more_text).color_range(1, 0..),

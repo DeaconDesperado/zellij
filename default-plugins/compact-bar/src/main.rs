@@ -1,5 +1,6 @@
 mod line;
 mod tab;
+use unicode_width::UnicodeWidthStr;
 
 use std::cmp::{max, min};
 use std::collections::BTreeMap;
@@ -142,7 +143,7 @@ impl ZellijPlugin for State {
             &active_swap_layout_name,
             is_swap_layout_dirty,
         );
-        let output = self.tab_line.iter().fold(String::new(), |output, part| {
+        self.tab_line.iter().fold(String::new(), |output, part| {
             let elem = match part.element {
                 LinePartElement::Empty => "".to_string(),
                 LinePartElement::Prefix => serialize_text(&part.part),
@@ -153,6 +154,5 @@ impl ZellijPlugin for State {
             };
             output + &elem
         });
-        print!("{}", output)
     }
 }
