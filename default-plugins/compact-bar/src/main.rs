@@ -181,7 +181,6 @@ impl ZellijPlugin for State {
             let mut active_tab_index = 0;
             let mut active_swap_layout_name = None;
             let mut is_swap_layout_dirty = false;
-            let mut is_alternate_tab = false;
             for t in &mut self.tabs {
                 let mut tabname = t.name.clone();
                 if t.active && self.mode_info.mode == InputMode::RenameTab {
@@ -200,7 +199,6 @@ impl ZellijPlugin for State {
                     self.mode_info.style.colors,
                     self.mode_info.capabilities,
                 );
-                is_alternate_tab = !is_alternate_tab;
                 all_tabs.push(tab);
             }
             self.tab_line = tab_line(
