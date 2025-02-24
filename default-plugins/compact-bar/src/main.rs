@@ -223,6 +223,7 @@ impl ZellijPlugin for State {
                 })
                 .collect();
 
+            // Render tab ribbons as a group to apply alternating styles
             let line = serialize_ribbon_line(tabs);
             let mut ribbons_rendered = false;
 
