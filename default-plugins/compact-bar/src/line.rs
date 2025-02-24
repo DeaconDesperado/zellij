@@ -115,7 +115,7 @@ fn left_more_message(tab_count_to_the_left: usize, separator: &str, tab_index: u
         part: Text::new(more_text).color_range(1, 0..),
         len: more_text_len,
         tab_index: Some(tab_index),
-        element: LinePartElement::MoreMarker,
+        element: LinePartElement::LeftMoreMarker,
     }
 }
 
@@ -139,7 +139,7 @@ fn right_more_message(
         part: Text::new(more_text).color_range(1, 0..),
         len: more_text_len,
         tab_index: Some(tab_index),
-        element: LinePartElement::MoreMarker,
+        element: LinePartElement::RightMoreMarker,
     }
 }
 
@@ -152,7 +152,7 @@ fn tab_line_prefix(session_name: Option<&str>, mode: InputMode, cols: usize) -> 
         part: Text::new(prefix_text),
         len: prefix_text_len,
         tab_index: None,
-        element: LinePartElement::Prefix,
+        element: LinePartElement::Title,
     }];
     if let Some(name) = session_name {
         let name_part = format!("({})", name);
@@ -162,7 +162,7 @@ fn tab_line_prefix(session_name: Option<&str>, mode: InputMode, cols: usize) -> 
                 part: Text::new(name_part),
                 len: name_part_len,
                 tab_index: None,
-                element: LinePartElement::Prefix,
+                element: LinePartElement::SessionName,
             })
         }
     }
@@ -181,7 +181,7 @@ fn tab_line_prefix(session_name: Option<&str>, mode: InputMode, cols: usize) -> 
             part: mode_part_styled_text,
             len: mode_part_len,
             tab_index: None,
-            element: LinePartElement::Prefix,
+            element: LinePartElement::ModeName,
         })
     }
 

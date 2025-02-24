@@ -1,5 +1,6 @@
 mod line;
 mod tab;
+use line::tab_separator;
 use unicode_width::UnicodeWidthStr;
 
 use std::cmp::{max, min};
@@ -12,12 +13,15 @@ use zellij_tile::prelude::*;
 use crate::line::tab_line;
 use crate::tab::tab_style;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, PartialOrd)]
 pub enum LinePartElement {
     Empty,
-    Prefix,
+    Title,
+    SessionName,
+    ModeName,
+    LeftMoreMarker,
     RibbonTabs,
-    MoreMarker,
+    RightMoreMarker,
     Padding,
     SwapLayoutStatus,
 }
@@ -210,18 +214,42 @@ impl ZellijPlugin for State {
                 &active_swap_layout_name,
                 is_swap_layout_dirty,
             );
-            let output = self.tab_line.iter().fold(String::new(), |output, part| {
-                let elem = match part.element {
-                    LinePartElement::Empty => "".to_string(),
-                    LinePartElement::Prefix => serialize_text(&part.part),
-                    LinePartElement::SwapLayoutStatus => serialize_ribbon(&part.part),
-                    LinePartElement::RibbonTabs => serialize_ribbon(&part.part),
-                    LinePartElement::MoreMarker => serialize_ribbon(&part.part),
-                    LinePartElement::Padding => serialize_text(&part.part),
-                };
-                output + &elem
-            });
-            print!("{}", output)
+            let tabs: Vec<&Text> = self
+                .tab_line
+                .iter()
+                .filter_map(|part| match part.element {
+                    LinePartElement::RibbonTabs => Some(&part.part),
+                    _ => None,
+                })
+                .collect();
+
+            let line = serialize_ribbon_line(tabs);
+            let mut ribbons_rendered = false;
+
+            print!(
+                "{}",
+                self.tab_line.iter().fold(String::new(), |acc, elem| {
+                    let output = match elem.element {
+                        LinePartElement::Title => serialize_text(&elem.part),
+                        LinePartElement::SessionName => serialize_text(&elem.part),
+                        LinePartElement::ModeName => serialize_text(&elem.part),
+                        LinePartElement::SwapLayoutStatus => serialize_ribbon(&elem.part),
+                        LinePartElement::LeftMoreMarker => serialize_ribbon(&elem.part),
+                        LinePartElement::RightMoreMarker => serialize_ribbon(&elem.part),
+                        LinePartElement::Padding => serialize_text(&elem.part),
+                        LinePartElement::Empty => "".to_string(),
+                        LinePartElement::RibbonTabs => {
+                            if ribbons_rendered {
+                                "".to_string()
+                            } else {
+                                ribbons_rendered = true;
+                                line.clone()
+                            }
+                        },
+                    };
+                    acc + &output
+                })
+            );
         }
     }
 }
@@ -239,7 +267,7 @@ pub fn text_copied_hint(copy_destination: CopyDestination) -> LinePart {
         part: Text::new(&hint).color_range(2, ..).opaque(),
         len: hint.len(),
         tab_index: None,
-        element: LinePartElement::Prefix,
+        element: LinePartElement::Title,
     }
 }
 
@@ -249,6 +277,6 @@ pub fn system_clipboard_error() -> LinePart {
         part: Text::new(&hint).color_range(2, ..).opaque(),
         len: hint.len(),
         tab_index: None,
-        element: LinePartElement::Prefix,
+        element: LinePartElement::Title,
     }
 }
